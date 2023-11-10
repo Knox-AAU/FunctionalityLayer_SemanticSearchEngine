@@ -1,3 +1,4 @@
+import './input.css';
 import * as React from "react";
 import WebApp from './WebApp';
 import { createRoot } from "react-dom/client";

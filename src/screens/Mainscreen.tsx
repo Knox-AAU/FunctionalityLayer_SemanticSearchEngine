@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import Comp1 from '../Components/comp1';
-import Comp2 from '../Components/comp2';
-
+// Mainscreen.tsx
+import React from 'react';
+import ChatOutputComponent from '../Components/ChatOutputComponent';
+import SearchBarComponent from '../Components/SearchBarComponent'; // Adjust the path as necessary
+import SearchResultComponent from '../Components/SearchResultComponent'; // Adjust the path as necessary
 
 const Mainscreen = () => {
     return ( 
-      <>
-            <div>Titleline</div>
-            <Comp1 />
-            <Comp2 />
-      </>
+        <>
+            <div className="title-line text-xl font-bold p-4">KNOX Search and Chat</div>
+            <ChatOutputComponent />
+            <SearchBarComponent />
+            <SearchResultComponent />
+        </>
     );
-
 }
 
 export default Mainscreen;
