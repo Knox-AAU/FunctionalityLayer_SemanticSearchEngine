@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
+import { handleSortByDate, handleSortByRelevance } from '../Components/SortingLogic';
 
 type SearchBarComponentProps = {
     onSearch: (query: string) => void; // Define the type for onSearch prop
     onSortByDate: () => void; // Callback function for sorting by date
+    onSortByRelevance: () => void; // Callback function for sorting by relevance
 };
 
-const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSortByDate }) => {
+const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSortByDate, onSortByRelevance }) => {
     const [query, setQuery] = useState('');
     const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
     const [searchOption, setSearchOption] = useState('Standardsearch');
@@ -16,7 +18,14 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
             onSearch(query); // Call the passed function with the query
         }
     };
-    
+
+    const handleSortByDate = () => {
+        onSortByDate(); // Call the passed function without arguments
+    };
+
+    const handleSortByRelevance = () => {
+        onSortByRelevance(); // Call the passed function without arguments
+    };
 
     const toggleAdvancedOptions = () => {
         setShowAdvancedOptions(!showAdvancedOptions);
@@ -80,18 +89,20 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                             onChange={(e) => setLanguage(e.target.value)} 
                             className="border p-1 rounded"
                         >
-                            <option value="">Select Language</option>
                             <option value="danish">Danish</option>
                             <option value="english">English</option>
                             <option value="autodetect">auto detect</option>
                         </select>
                     </div>
-                    
-                    <button onClick={onSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Date</button>
-                    <button className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
+                    {/* implement rising and falling options for datesort */}
+                    <button onClick={handleSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Date</button> 
+                    <button onClick={handleSortByRelevance} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
 
-                    {/* Additional button if needed
-                    <button className="bg-blue-500 text-white p-2 rounded mr-2 mt-2">Option 3</button> */}
+                    <div className="search-bar p-4">
+                    {/* ...other elements */}
+
+                    {/* ...other elements */}
+                </div>
                 </div>
             )}
         </div>
