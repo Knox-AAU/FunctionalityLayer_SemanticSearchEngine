@@ -1,21 +1,30 @@
 import React from 'react';
+import { PdfObjects } from '../screens/Mainscreen';
+import { PdfData } from '../screens/Mainscreen';
 
-// Define a type for the component props
-type SearchResultComponentProps = {
-    pdfUrls: string[];
-};
+const SearchResultComponent = ({ PdfObjects }: { PdfObjects: PdfData[] }) => {
 
-const SearchResultComponent: React.FC<SearchResultComponentProps> = ({ pdfUrls }) => {
     return (
         <div className="search-results border-2 border-blue-900 rounded-lg overflow-y-auto h-1/3 p-4 w-4/5 ml-8 pl-3 bg-gray-500">
-            {pdfUrls.map((url, index) => (
-                <a key={index} href={url} target="_blank" rel="noopener noreferrer">
-                    View PDF {index + 1}
+            {PdfObjects.map((PdfData) => (
+            <div key={PdfData.url} className="mb-4">
+                <p className="text-sm text-gray-500">
+                    Date: {PdfData.date} | Author: {PdfData.author}
+                </p>
+                <a
+                    href={PdfData.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                >
+                    {PdfData.title}
                 </a>
-                // Or using an <iframe> or <object> tag for direct embedding
-            ))}
+                <span className="text-gray-400 ml-2">Relevance: {PdfData.relevance}</span>
+            </div>
+        ))}
         </div>
     );
 }
+
 
 export default SearchResultComponent;

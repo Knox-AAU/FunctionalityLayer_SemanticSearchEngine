@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 
-
 type SearchBarComponentProps = {
-    onSearch: (query: string) => void;
+    onSearch: (query: string) => void; // Define the type for onSearch prop
+    onSortByDate: () => void; // Callback function for sorting by date
 };
 
-const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch }) => {
+const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSortByDate }) => {
     const [query, setQuery] = useState('');
     const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
-    const [searchOption, setSearchOption] = useState('');
-    const [language, setLanguage] = useState('');
+    const [searchOption, setSearchOption] = useState('Standardsearch');
+    const [language, setLanguage] = useState('autodetect');
 
     const handleSearch = () => {
         if (query) {
             onSearch(query); // Call the passed function with the query
         }
     };
-
-
+    
 
     const toggleAdvancedOptions = () => {
         setShowAdvancedOptions(!showAdvancedOptions);
@@ -41,25 +40,36 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch }) => 
             {showAdvancedOptions && (
                 <div className="advanced-options mt-2 flex flex-wrap">
                     {/* Radio Buttons */}
+                    
                     <div className="flex items-center mr-4">
                         <input 
                             type="radio" 
-                            value="authors" 
-                            checked={searchOption === 'authors'} 
+                            value="Authorsearch" 
+                            checked={searchOption === 'Authorsearch'} 
                             onChange={(e) => setSearchOption(e.target.value)} 
                             className="mr-1"
                         />
-                        <label>Search for Authors</label>
+                        <label>Author Search</label>
                     </div>
                     <div className="flex items-center mr-4">
                         <input 
                             type="radio" 
-                            value="region" 
-                            checked={searchOption === 'region'} 
+                            value="Titlesearch" 
+                            checked={searchOption === 'Titlesearch'} 
                             onChange={(e) => setSearchOption(e.target.value)} 
                             className="mr-1"
                         />
-                        <label>Search for Region</label>
+                        <label>Title Search</label>
+                    </div>
+                    <div className="flex items-center mr-4">
+                        <input 
+                            type="radio" 
+                            value="Standardsearch" 
+                            checked={searchOption === 'Standardsearch'} 
+                            onChange={(e) => setSearchOption(e.target.value)} 
+                            className="mr-1"
+                        />
+                        <label>Normal KNOX search</label>
                     </div>
 
                     {/* Dropdown Menu for Language Selection */}
@@ -73,11 +83,15 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch }) => 
                             <option value="">Select Language</option>
                             <option value="danish">Danish</option>
                             <option value="english">English</option>
+                            <option value="autodetect">auto detect</option>
                         </select>
                     </div>
+                    
+                    <button onClick={onSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Date</button>
+                    <button className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
 
-                    {/* Additional button if needed */}
-                    <button className="bg-blue-500 text-white p-2 rounded mr-2 mt-2">Option 3</button>
+                    {/* Additional button if needed
+                    <button className="bg-blue-500 text-white p-2 rounded mr-2 mt-2">Option 3</button> */}
                 </div>
             )}
         </div>
