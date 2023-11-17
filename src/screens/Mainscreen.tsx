@@ -80,14 +80,19 @@ const Mainscreen = () => {
   return (
     <div className="main-container h-screen mx-auto overflow-y-auto bg-gray-900">
       <div className="title-line text-xl font-bold p-4 text-white pl-4">KNOX Search and Chat</div>
-      <ChatComponent chatMessages={chatMessages} onChat={handleChat} />
-      <SearchBarComponent
-        onSearch={fetchSearchResults}
-        onSortByDate={() => handleSortByDate(PdfObjects, setPdfObjects)}
-        onSortByRelevance={() => handleSortByRelevance(PdfObjects, setPdfObjects)}
-      />
-      {loading && <div>Loading...</div>}
-      {!loading && <SearchResultComponent PdfObjects={PdfObjects} />}
+        <div className='Chatcomponent'>
+          <ChatComponent chatMessages={chatMessages} onChat={handleChat} />
+        </div>
+
+        <div className='Searchcomponent'>
+          <SearchBarComponent
+            onSearch={fetchSearchResults}
+            onSortByDate={() => handleSortByDate(PdfObjects, setPdfObjects)}
+            onSortByRelevance={() => handleSortByRelevance(PdfObjects, setPdfObjects)}
+          />
+          {loading && <div>Loading...</div>}
+          {!loading && <SearchResultComponent PdfObjects={PdfObjects} />}
+        </div>
     </div>
   );
 };
