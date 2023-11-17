@@ -30,6 +30,11 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
     const toggleAdvancedOptions = () => {
         setShowAdvancedOptions(!showAdvancedOptions);
     };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     return (
         <div className="search-bar ml-8 border-2 border-gray-900 rounded-lg  mb-2 w-4/5 pl-6 py-2  bg-darkgrey">
@@ -37,6 +42,7 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                 type="text" 
                 value={query} 
                 onChange={(e) => setQuery(e.target.value)} 
+                onKeyDown={handleKeyDown}
                 className="border p-2 mr-2 w-4/5"
             />
             <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded">
@@ -98,11 +104,7 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                     <button onClick={handleSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Date</button> 
                     <button onClick={handleSortByRelevance} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
 
-                    <div className="search-bar p-4">
-                    {/* ...other elements */}
-
-                    {/* ...other elements */}
-                </div>
+                   
                 </div>
             )}
         </div>

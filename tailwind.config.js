@@ -11,6 +11,7 @@ module.exports = {
               lightgrey: '#d3d3d3',
               midnight: '#191970',
               olive: '#808000',
+              darkolive: '#556b2f',
               orange: '#ffa500',
               purple: '#800080',
               rebeccapurple: '#663399',
