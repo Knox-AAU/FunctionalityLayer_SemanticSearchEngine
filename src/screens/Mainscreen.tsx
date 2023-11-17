@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ChatOutputComponent from '../Components/ChatOutputComponent';
+import ChatComponent from '../Components/ChatComponent';
 import SearchBarComponent from '../Components/SearchBarComponent';
 import SearchResultComponent from '../Components/SearchResultComponent';
 
@@ -78,9 +78,9 @@ const Mainscreen = () => {
   }, []);
 
   return (
-    <div className="main-container h-screen mx-auto bg-gray-900">
+    <div className="main-container h-screen mx-auto overflow-y-auto bg-gray-900">
       <div className="title-line text-xl font-bold p-4 text-white pl-4">KNOX Search and Chat</div>
-      <ChatOutputComponent chatMessages={chatMessages} onChat={handleChat} />
+      <ChatComponent chatMessages={chatMessages} onChat={handleChat} />
       <SearchBarComponent
         onSearch={fetchSearchResults}
         onSortByDate={() => handleSortByDate(PdfObjects, setPdfObjects)}

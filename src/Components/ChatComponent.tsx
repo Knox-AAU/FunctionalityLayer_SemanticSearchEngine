@@ -10,9 +10,10 @@ type ChatMessage = {
   sender: 'user' | 'backend';
 };
 
-const ChatOutputComponent: React.FC<ChatComponentProps> = ({ chatMessages, onChat }) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ chatMessages, onChat }) => {
   const [chatQuery, setChatQuery] = useState('');
   const [chatLanguage, setChatLanguage] = useState('autodetect');
+  const [isMessagesVisible, setIsMessagesVisible] = useState(true);
 
   const handleChat = () => {
     if (chatQuery) {
@@ -20,28 +21,44 @@ const ChatOutputComponent: React.FC<ChatComponentProps> = ({ chatMessages, onCha
       setChatQuery('');
     }
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-        handleChat();
+      handleChat();
     }
-};
+  };
+
+  const toggleMessagesVisibility = () => {
+    setIsMessagesVisible(!isMessagesVisible);
+  };
+
   return (
-    <div className="border-2 border-gray-900 mb-1 rounded-lg overflow-y-auto h-1/3 ml-8 w-4/5 bg-olive ">
-      <div className=" mb-1 rounded-lg overflow-y-auto h-4/5 ml-8 w-4/5 bg-olive ">
+    <div className={" mb-2 rounded-lg overflow-hidden h-2/3 ml-8 w-4/5 bg-gray-900 "}style={{ maxHeight: isMessagesVisible ? 'calc(100% - 12rem)' : '12rem' }}>
+      
+      {/* Chart output*/}
+      <div className={`rounded-lg overflow-y-auto pl-4 w-7/8 bg-olive border-2 border-gray-900 `} style={{ maxHeight: isMessagesVisible ? 'calc(100% - 6rem)' : '6.5rem' }}>
         {chatMessages.map((message, index) => (
-          <p key={index} className="text-lg mb-2 text-gray-900">
+          <p key={index} className="text-lg  text-gray-900">
             {message.text}
           </p>
         ))}
       </div>
-      <div className="search-bar rounded-lg mb-2 w-4/4 pl-2 pr-2 py-2 bg-darkolive">
+
+      {/* Chart visibility button*/}
+      <div className={`rounded-lg h-1.25rem pl-12 pr-12 w-7/8 bg-gray-900`}>
+        <button onClick={toggleMessagesVisibility} className="bg-darkgrey pl-12 pr-12 text-black text-xs rounded">
+          {isMessagesVisible ? ' ^ ^ ^ ' : ' v v v '}
+        </button>
+      </div>
+
+      {/* Chat input*/}
+      <div className="chat-bar h-1/9 border-2 border-gray-900 rounded-lg  mb-2  pl-6 py-2  bg-olive">
         <input
           type="text"
           value={chatQuery}
           onChange={(e) => setChatQuery(e.target.value)}
-          onKeyDown={handleKeyDown} 
-          className="border p-2 mr-2 w-4/5"
-        />
+          onKeyDown={handleKeyDown}
+          className="border p-2 mr-2 w-4/5"/>
         <button onClick={handleChat} className="bg-blue-500 text-white p-2 rounded">
           Send
         </button>
@@ -51,14 +68,15 @@ const ChatOutputComponent: React.FC<ChatComponentProps> = ({ chatMessages, onCha
           value={chatLanguage}
           onChange={(e) => setChatLanguage(e.target.value)}
           className="border p-1 rounded"
-        >
+          >
           <option value="danish">Danish</option>
           <option value="english">English</option>
           <option value="autodetect">auto detect</option>
         </select>
       </div>
+
     </div>
   );
 };
 
-export default ChatOutputComponent;
+export default ChatComponent;
