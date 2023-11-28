@@ -1,16 +1,28 @@
 import React from 'react';
 
-const ChatOutputComponent = () => {
-    // Example chat messages (replace with actual data)
-    const messages = ["Message 1", "Message 2", /* ... more messages ... */];
+type ChatOutputComponentProps = {
+  chatMessages: ChatMessage[];
+  isMessagesVisible: boolean;
+};
 
+type ChatMessage = {
+  text: string;
+  sender: 'user' | 'backend';
+};
+
+const ChatOutputComponent: React.FC<ChatOutputComponentProps> = ({ chatMessages, isMessagesVisible }) => {
+    const maxHeightWhenHidden = '10vh'; // Adjust this value as needed
+    const maxHeight = isMessagesVisible ? '65vh' : maxHeightWhenHidden;
+  
     return (
-        <div className="border-2 border-gray-900 mb-1 rounded-lg overflow-y-auto h-1/3 ml-8 w-4/5 bg-olive pl-3">
-            {messages.map((message, index) => (
-                <p key={index} className="text-lg mb-2 text-gray-900">{message}</p>
-            ))}
-        </div>
+      <div className={`rounded-lg overflow-y-auto pl-4 w-7/8 bg-olive`} style={{ maxHeight }}>
+        {chatMessages.map((message, index) => (
+          <p key={index} className="text-lg text-gray-900">
+            {message.text}
+          </p>
+        ))}
+      </div>
     );
-}
+  };
 
 export default ChatOutputComponent;

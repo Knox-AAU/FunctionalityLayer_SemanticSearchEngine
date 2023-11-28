@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
-import { handleSortByDate, handleSortByRelevance } from '../Components/SortingLogic';
+// import { handleSortByDate, handleSortByRelevance } from '../Components/SortingLogic';
 
 type SearchBarComponentProps = {
-    onSearch: (query: string) => void; // Define the type for onSearch prop
-    onSortByDate: () => void; // Callback function for sorting by date
-    onSortByRelevance: () => void; // Callback function for sorting by relevance
-};
+    onSearch: (searchParams: { query: string, publishedAfter: string, publishedBefore: string }) => void;
+    onSortByDate: () => void;
+    onSortByRelevance: () => void;
+    sortOrder: 'ascending' | 'descending';
+  };
 
-const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSortByDate, onSortByRelevance }) => {
+const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSortByDate, onSortByRelevance, sortOrder }) => {
     const [query, setQuery] = useState('');
     const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
     const [searchOption, setSearchOption] = useState('Standardsearch');
     const [language, setLanguage] = useState('autodetect');
 
-    const handleSearch = () => {
-        if (query) {
-            onSearch(query); // Call the passed function with the query
-        }
-    };
+   
 
     const handleSortByDate = () => {
         onSortByDate(); // Call the passed function without arguments
@@ -30,18 +27,36 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
     const toggleAdvancedOptions = () => {
         setShowAdvancedOptions(!showAdvancedOptions);
     };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+    const [publishedAfter, setPublishedAfter] = useState('');
+    const [publishedBefore, setPublishedBefore] = useState('');
 
+    const handleSearch = () => {
+        if (query) {
+          onSearch({ query, publishedAfter, publishedBefore });
+        }
+      };
     return (
-        <div className="search-bar ml-8 border-2 border-gray-900 rounded-lg  mb-2 w-4/5 pl-6 py-2  bg-darkgrey">
+        <div className="search-bar ml-8 border-2 border-gray-900 rounded-lg mb-2 w-4/5 pl-6 py-2  bg-darkgrey">
             <input 
                 type="text" 
                 value={query} 
                 onChange={(e) => setQuery(e.target.value)} 
+                onKeyDown={handleKeyDown}
                 className="border p-2 mr-2 w-4/5"
             />
-            <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded">
+            <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded mr-2">
                 Search
+            </button>  
+                       <button onClick={onSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">
+                Sort by Date {sortOrder === 'ascending' ? '↑' : '↓'}
             </button>
+            <button onClick={handleSortByRelevance} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
+            
             <button onClick={toggleAdvancedOptions} className="bg-gray-500 text-white p-2 rounded ml-2">
                 Advanced
             </button>
@@ -51,14 +66,14 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                     {/* Radio Buttons */}
                     
                     <div className="flex items-center mr-4">
+                        <label>Author:</label>
                         <input 
-                            type="radio" 
-                            value="Authorsearch" 
+                            value="Bruce Wayne" 
+                            type="text" 
                             checked={searchOption === 'Authorsearch'} 
                             onChange={(e) => setSearchOption(e.target.value)} 
                             className="mr-1"
                         />
-                        <label>Author Search</label>
                     </div>
                     <div className="flex items-center mr-4">
                         <input 
@@ -68,7 +83,7 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                             onChange={(e) => setSearchOption(e.target.value)} 
                             className="mr-1"
                         />
-                        <label>Title Search</label>
+                        <label>Search titles only</label>
                     </div>
                     <div className="flex items-center mr-4">
                         <input 
@@ -94,15 +109,20 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onSor
                             <option value="autodetect">auto detect</option>
                         </select>
                     </div>
-                    {/* implement rising and falling options for datesort */}
-                    <button onClick={handleSortByDate} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Date</button> 
-                    <button onClick={handleSortByRelevance} className="bg-rebeccapurple text-white pl-2 pr-2 rounded mr-2 mt-0.5 h-8">Sort by Relevance</button>
-
-                    <div className="search-bar p-4">
-                    {/* ...other elements */}
-
-                    {/* ...other elements */}
-                </div>
+                   
+                    <input
+                    type="date"
+                    value={publishedAfter}
+                    onChange={(e) => setPublishedAfter(e.target.value)}
+                    className="border p-2 mr-2"
+                    />
+                    <input
+                        type="date"
+                        value={publishedBefore}
+                        onChange={(e) => setPublishedBefore(e.target.value)}
+                        className="border p-2 mr-2"
+                    />
+                   
                 </div>
             )}
         </div>
