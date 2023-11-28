@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import ChatComponent from '../Components/ChatComponent';
+import React, { useState, useEffect, useCallback } from 'react';
 import SearchBarComponent from '../Components/SearchBarComponent';
+import { sortPdfObjectsByDate, sortPdfObjectsByRelevance } from '../TypesAndLogic/SortingLogic2';
+import ChatComponent from '../Components/ChatComponent';
 import SearchResultComponent from '../Components/SearchResultComponent';
-
-import { dummyData } from '../Components/dummydata';
-import { handleSortByDate, handleSortByRelevance } from '../Components/SortingLogic';
+import { dummyData } from '../TypesAndLogic/dummydata';
 
 export type PdfData = {
   url: string;
@@ -13,14 +12,35 @@ export type PdfData = {
   date: string;
   relevance: number;
 };
+
 export type PdfObjects = PdfData[];
 
 const Mainscreen = () => {
   const [PdfObjects, setPdfObjects] = useState<PdfData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
 
-  const fetchSearchResults = async (query: string) => {
+  const handleSortByDate = useCallback(() => {
+    const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
+    setPdfObjects(sortedPdfObjects);
+    setSortOrder((prevSortOrder) =>
+      prevSortOrder === 'ascending' ? 'descending' : 'ascending'
+    );
+  }, [PdfObjects, sortOrder]);
+
+  const handleSortByRelevance = useCallback(() => {
+    const sortedPdfObjects = sortPdfObjectsByRelevance(PdfObjects);
+    setPdfObjects(sortedPdfObjects);
+  }, [PdfObjects]);
+
+  const fetchSearchResults = async (searchParams: {
+    query: string;
+    publishedAfter?: string;
+    publishedBefore?: string;
+    author?: string;
+    titleSearch?: boolean;
+  }) => {
     setLoading(true);
     setError(null);
 
@@ -28,19 +48,14 @@ const Mainscreen = () => {
       const response = await fetch(`http://search.aau.dk/api/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify(searchParams),
       });
-
-      // Log the request details
-      console.log(`Search Request URL: http://search.aau.dk/api/search`);
-      console.log(`Search Request Method: POST`);
-      console.log(`Search Request Body: ${JSON.stringify({ query })}`);
 
       if (!response.ok) {
         setError('Failed to fetch from the API');
         setPdfObjects(dummyData);
       } else {
-        const data: PdfData[] = await response.json(); // Use Pdfdata type
+        const data: PdfData[] = await response.json();
         setPdfObjects(data);
       }
     } catch (error) {
@@ -52,56 +67,39 @@ const Mainscreen = () => {
   };
 
   const handleChat = async (query: string) => {
-    // Log the chat request details
     console.log(`Chat Request: ${query}`);
-
-    // Send the chat query to the backend (replace this with actual backend integration)
-    // ...
-
-    // Post the user's query in the chat
-    setChatMessages((prevMessages) => [...prevMessages, { text: query, sender: 'user' }]);
-
-    // Receive and post the response from the backend (replace this with actual backend integration)
-    // ...
-
-    // Example response from the backend (replace this with actual backend response)
-    const response = 'This is a response from the backend.';
-
-    // Post the response in the chat
-    setChatMessages((prevMessages) => [...prevMessages, { text: response, sender: 'backend' }]);
+    // chat handling logic
   };
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
-    // Initial load, you can call fetchSearchResults with a default query here if needed.
+    // Initial load
   }, []);
 
   return (
     <div className="main-container h-screen mx-auto overflow-y-auto bg-gray-900">
       <div className="title-line text-xl font-bold p-4 text-white pl-4">KNOX Search and Chat</div>
-        <div className='Chatcomponent'>
-          <ChatComponent chatMessages={chatMessages} onChat={handleChat} />
-        </div>
+      <div className='Chatcomponent'>
+        <ChatComponent chatMessages={chatMessages} onChat={handleChat} />
+      </div>
 
-        <div className='Searchcomponent'>
-          <SearchBarComponent
-            onSearch={fetchSearchResults}
-            onSortByDate={() => handleSortByDate(PdfObjects, setPdfObjects)}
-            onSortByRelevance={() => handleSortByRelevance(PdfObjects, setPdfObjects)}
-          />
-          {loading && <div>Loading...</div>}
-          {!loading && <SearchResultComponent PdfObjects={PdfObjects} />}
-        </div>
+      <div className='Searchcomponent'>
+        <SearchBarComponent
+          onSearch={(searchParams) => fetchSearchResults(searchParams)}
+          onSortByDate={handleSortByDate}
+          onSortByRelevance={handleSortByRelevance}
+          sortOrder={sortOrder}
+        />
+        {loading && <div>Loading...</div>}
+        {!loading && <SearchResultComponent PdfObjects={PdfObjects} />}
+      </div>
     </div>
   );
 };
 
 export default Mainscreen;
-type ChatComponentProps = {
-    chatMessages: ChatMessage[];
-    onChat: (query: string) => void;
-  };
+
 type ChatMessage = {
   text: string;
   sender: 'user' | 'backend';
