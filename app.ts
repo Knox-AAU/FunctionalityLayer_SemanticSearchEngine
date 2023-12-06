@@ -6,7 +6,11 @@ import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 import * as fs from 'fs';
 
 const hostname = online ? '192.168.0.142' : 'localhost';
+<<<<<<< HEAD
+const port = +(process.env.PORT || 3000);
+=======
 const port = 3000;
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
 
 import { postHandler, getHandler, fileResponse, errorResponse } from './server/responseHandlers';
 

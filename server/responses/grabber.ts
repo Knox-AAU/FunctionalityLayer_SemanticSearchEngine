@@ -16,7 +16,11 @@ let _isConnected = false;
 const client = new Client({
   user: 'defaultuser',
   host: 'localhost',
+<<<<<<< HEAD
+  database: 'semanticdb',
+=======
   database: 'pdfdb',
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
   password: '1234',
   port: 5432,
 });
@@ -44,7 +48,11 @@ export const GrabButDataFirst = (req: Request, res: Response) => {
 
 const insertIntoDB = async (entryPromise: Promise<dbEntry>, req: Request, res: Response) => {
   const entry = await entryPromise;
+<<<<<<< HEAD
+  await ensureConnected(client);
+=======
   await ensureConnected();
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
 
   const insertQuery = 'INSERT INTO pdfTable(title, url, pdfPath, author, timestamp) VALUES ($1, $2, $3, $4, $5)';
   const values = [entry.title, entry.url, entry.pdfPath, "N/A", Date.now().toString().split('T')[0]];
@@ -61,7 +69,11 @@ const insertIntoDB = async (entryPromise: Promise<dbEntry>, req: Request, res: R
 
 }
 
+<<<<<<< HEAD
+export const ensureConnected = async (client: Client): Promise<void> => {
+=======
 const ensureConnected = async (): Promise<void> => {
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
   if (!_isConnected) {
     await client.connect();
     _isConnected = true;
