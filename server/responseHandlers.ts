@@ -4,6 +4,10 @@ import * as fs from 'fs';
 //const operatorPath = "Server/ServerData/operators.json";
 import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 import { GrabButDataFirst } from "./responses/grabber";
+<<<<<<< HEAD
+import { spoQuery } from './responses/spoGet';
+=======
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
 
 //Handles post requests
 export function postHandler(req: Request, res: Response) {
@@ -11,11 +15,19 @@ export function postHandler(req: Request, res: Response) {
     //const path = "Server/ServerData/CallerDB/callers" + "-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + ".json";
     console.log(req.url);
     switch (req.url) {
+<<<<<<< HEAD
+        case 'client/db/getFromS':
+            return spoQuery(req, res);
+=======
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
         case "build/grabUrl":
             return GrabButDataFirst(req, res);
         default:
             return errorResponse(res, 404, "Post request not found");
+<<<<<<< HEAD
+=======
 
+>>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
     }
 }
 
