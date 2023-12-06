@@ -1,36 +1,18 @@
 services:
   postgres:
     image: postgres:latest
-<<<<<<< HEAD
-    container_name: semanticdb
-    environment:
-      POSTGRES_DB: semanticdb
-=======
     container_name: postgresPdfDB
     environment:
       POSTGRES_DB: pdfdb
->>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: securePassword
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - ./data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-<<<<<<< HEAD
-      - ./localTempDB.csv:/docker-entrypoint-initdb.d/localTempDB.csv
     networks:
       - my-network
-  node:
-    image: semantic/node
-    container_name: semanticNode
-    build:
-      context: ../
-      dockerfile: ./docker/node.dockerfile
-=======
-    networks:
-      - my-network
->>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
 
 networks:
   my-network:
