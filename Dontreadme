@@ -1,3 +1,33 @@
-you can use this boilerplate all you like, no ned to credit me. it just works to suit my needs, maybe it will help you too
+
+
+# KNOX Semantic Search Engine 
+## Overview
+This project contains both the front end and back end of the Semantic Search Engine, the work of group F of the KNOX project at the fall semester at AAU, 2023.
+this Readme file will help you understand the front-end part, which is also the frontend for the chatbot (group G's work)
+
+## Technologies Used
+- React
+- TypeScript
+- Tailwind CSS
+
+## Getting Started
+*****IMPORTANT - Before running:
 make sure to update node modules after download, as they are in the git-ignore  - npm install
 also run this: npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
+after that, you can start a localhost instance of the frontend with the command: npm start (give it a minute, can take a while to start up)
+You can then edit the code while the server is running, and see the effects on the server instance as soon as you save the edited document.
+
+
+### Prerequisites
+
+- Node.js 
+- npm 
+
+## Installation
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/your-project.git
+
+## Structure
+All the documents pertaining to the front-end are found within the "src" folder. "Mainscreen.tsx" is the file building the screen first presented to the user when they enter the site.
