@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgresPdfDB
+    environment:
+      POSTGRES_DB: pdfdb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: securePassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - my-network
+
+networks:
+  my-network:
