@@ -25,3 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 
 *.csv
+
+# Torch
+server/ranking/Lib/site-packages/torch/
