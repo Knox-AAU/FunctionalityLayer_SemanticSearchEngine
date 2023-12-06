@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS pdfTable (
     timestamp bigint
 );
 
-<<<<<<< HEAD
 CREATE TABLE IF NOT EXISTS spoTable (
     S VARCHAR(184),
     P VARCHAR(34),
@@ -17,8 +16,6 @@ CREATE TABLE IF NOT EXISTS spoTable (
 \copy spoTable FROM '/docker-entrypoint-initdb.d/localTempDB.csv' WITH (FORMAT CSV, HEADER true, DELIMITER ',');
 
 
-=======
->>>>>>> 0ea5ad0edd12a0336b6d2af2011e1f0af26f06ef
 -- Create a user
 CREATE USER defaultuser WITH PASSWORD '1234';
 
