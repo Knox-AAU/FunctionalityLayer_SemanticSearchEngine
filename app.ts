@@ -10,6 +10,8 @@ const port = +(process.env.PORT || 3000);
 
 import { postHandler, getHandler, fileResponse, errorResponse } from './server/responseHandlers';
 
+export const llamaUrl = "knox-proxy01.srv.aau.dk/llama-api/llama";
+
 
 //Create server object with the function requestHandler as input
 const server = http.createServer(requestHandler);

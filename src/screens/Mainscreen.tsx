@@ -54,26 +54,21 @@ const Mainscreen = () => {
     console.log(`Search Request Body: ${JSON.stringify({ searchParams })}`);
 
     try {
-      const response = await fetch(`http://search.aau.dk/api/search`, {
+      const response = await fetch(``, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(searchParams),
+        body: JSON.stringify({ "query": searchParams }),
       });
-
       if (!response.ok) {
-        setError('Failed to fetch from the API');
-        setPdfObjects(dummyData);
+        alert("ERR" + response.status);
       } else {
-        const data: PdfData[] = await response.json();
-        setPdfObjects(data);
+        console.log(await response.json());
       }
-    } catch (error) {
-      setError('Failed to fetch from the API');
-      setPdfObjects(dummyData);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      alert(err);
+      console.log(err);
     }
-  };
+  }
 
   const handleChat = async (query: string) => {
     // Log the chat request details
@@ -84,7 +79,7 @@ const Mainscreen = () => {
 
     try {
       // Send the user's query to the chatbot backend
-      const response = await fetch('http://your-chatbot-backend-url', {
+      const response = await fetch('/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
