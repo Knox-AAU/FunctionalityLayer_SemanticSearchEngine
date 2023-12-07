@@ -1,3 +1,4 @@
 {
-"isGitignoreExtActive": true,
+	"isGitignoreExtActive": true,
+	"git.ignoreLimitWarning": true
 }

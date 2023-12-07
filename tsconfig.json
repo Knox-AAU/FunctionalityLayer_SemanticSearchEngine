@@ -1,26 +1,31 @@
 {
-    "compilerOptions": {
-        "target": "ES6",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "strict": false,
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "allowJs": false,
-        "jsx": "react-jsx",
-        "noImplicitAny": true,
-        "noUnusedLocals": false, /* Report errors on unused locals. */
-        "noUnusedParameters": false, /* Report errors on unused parameters. */
-        "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-        "noFallthroughCasesInSwitch": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-    },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+	"compilerOptions": {
+		"target": "ES6",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"strict": false,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"allowJs": false,
+		"jsx": "preserve",
+		"noImplicitAny": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"exclude": ["node_modules"],
+	"scripts": {
+		"build": "tsc",
+		"server": "node dist/app.js"
+	}
 }
