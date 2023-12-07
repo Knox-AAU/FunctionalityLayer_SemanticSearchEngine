@@ -213,7 +213,7 @@ class Ranking():
 
         #Load search query from SPOIdentifier.py and splits into individual words
         query = [sys.argv[1]]
-    
+        
         #query = ["Who was president during the fall of Afghanistan"]
 
 
