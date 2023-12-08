@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "server": "clear && react-scripts build && ts-node app.ts",
+    "server": "react-scripts build && ts-node app.ts",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

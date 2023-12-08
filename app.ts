@@ -10,8 +10,10 @@ const port = +(process.env.PORT || 3000);
 
 import { postHandler, getHandler, fileResponse, errorResponse } from './server/responseHandlers';
 
+// for local testing of lama:
 //export const llamaUrl = "http://knox-proxy01.srv.aau.dk/llama-api/llama";
-export const llamaUrl = "http://localhost:5000/llama";
+// for using lama api:
+export const llamaUrl = "http://knox-proxy01.srv.aau.dk/llama-api/llama";
 
 
 //Create server object with the function requestHandler as input
