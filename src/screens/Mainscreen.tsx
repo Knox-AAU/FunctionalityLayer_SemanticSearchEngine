@@ -40,7 +40,7 @@ const Mainscreen = () => {
     navigate(path);
   }
 
-  const fetchSearchResults = async (searchParams: {
+  const HandleSearch = async (searchParams: {
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -49,15 +49,14 @@ const Mainscreen = () => {
   }) => {
     setLoading(true);
     setError(null);
-    console.log(`Search Request URL: http://search.aau.dk/api/search`);
-    console.log(`Search Request Method: POST`);
-    console.log(`Search Request Body: ${JSON.stringify({ searchParams })}`);
 
     try {
-      const response = await fetch(``, {
+        console.log(searchParams);
+        console.log(JSON.stringify({ "query": searchParams }));
+        const response = await fetch(`/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "query": searchParams }),
+        body: JSON.stringify(searchParams),
       });
       if (!response.ok) {
         alert("ERR" + response.status);
@@ -68,6 +67,8 @@ const Mainscreen = () => {
       alert(err);
       console.log(err);
     }
+    
+
   }
 
   const handleChat = async (query: string) => {
@@ -127,7 +128,7 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
-          onSearch={(searchParams) => fetchSearchResults(searchParams)}
+          onSearch={(searchParams) => HandleSearch(searchParams)}
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
