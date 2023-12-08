@@ -1,5 +1,6 @@
 
 
+
 # KNOX Semantic Search Engine 
 ## Overview
 This project contains both the front end and back end of the Semantic Search Engine, the work of group F of the KNOX project at the fall semester at AAU, 2023.
@@ -13,6 +14,7 @@ this Readme file will help you understand the front-end part, which is also the 
 ## Getting Started
 *****IMPORTANT - Before running:
 make sure to update node modules after download, as they are in the git-ignore  - npm install
+
 also run this: npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
 after that, you can start a localhost instance of the frontend with the command: npm start (give it a minute, can take a while to start up)
 You can then edit the code while the server is running, and see the effects on the server instance as soon as you save the edited document.

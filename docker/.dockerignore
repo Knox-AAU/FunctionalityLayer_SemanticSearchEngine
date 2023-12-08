@@ -1,0 +1,6 @@
+build/
+docker/
+node_modules/
+
+*.csv
+docker/localTempDB.csv
