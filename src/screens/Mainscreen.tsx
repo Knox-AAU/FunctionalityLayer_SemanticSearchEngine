@@ -34,7 +34,8 @@ const Mainscreen = () => {
     setPdfObjects(sortedPdfObjects);
   }, [PdfObjects]);
 
-  const fetchSearchResults = async (searchParams: {
+
+  const handleSearch = async (searchParams: {
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -125,7 +126,7 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
-          onSearch={(searchParams) => fetchSearchResults(searchParams)}
+          onSearch={(searchParams) => handleSearch(searchParams)}
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
