@@ -7,7 +7,7 @@ type queryRequest = {
     query: string,
 }
 
-export function search(req, res) {
+export function search(req: Request, res: Response) {
     getPostData(req)
         .then((data) => {
             const formattedData = data as queryRequest;

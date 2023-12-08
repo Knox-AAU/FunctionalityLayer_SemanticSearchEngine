@@ -24,7 +24,18 @@ services:
     environment:
       TERM: xterm
       PUPPETEER_EXECUTABLE_PATH: /app/puppeteer/chrome/linux-119.0.6045.105/chrome-linux64/chrome
+    volumes:
+      - ./texts:/app/texts
+  ranking:
+    image: semantic/ranking
+    container_name: ranking
+    build:
+      context: ../
+      dockerfile: ./docker/ranking.dockerfile
+    volumes:
+      - ./texts:/app/texts
 
 networks:
   my-network:
+
 
