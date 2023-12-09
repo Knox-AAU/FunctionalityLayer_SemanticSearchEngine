@@ -8,14 +8,15 @@ import { dirname } from 'path';
 import { Client } from 'pg';
 
 const rootPath = dirname(require.main?.filename!);
-const pdfDir = rootPath + "/data/pdfs/";
-const stringDir = rootPath + "/data/strings/"
+const pdfDir = rootPath + "/texts/pdfs/";
+const stringDir = rootPath + "/texts/strings/"
+console.log(pdfDir);
 let _isConnected = false;
 
 //Check docker folder
 const client = new Client({
   user: 'defaultuser',
-  host: 'localhost',
+  host: 'postgres',
   database: 'semanticDB',
   password: '1234',
   port: 5432,

@@ -14,7 +14,7 @@ export function spoQuery(req: Request, res: Response) {
     const data = dataTemp as spoQuery
     const client = new Client({
       user: 'defaultUser',
-      host: 'localhost', // or the address where your PostgreSQL server is running
+      host: 'postgres', // or the address where your PostgreSQL server is running
       database: 'SPODB',
       password: '',
       port: 5432, // the default PostgreSQL port

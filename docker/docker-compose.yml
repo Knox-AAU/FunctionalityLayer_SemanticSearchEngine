@@ -20,11 +20,33 @@ services:
     build:
       context: ../
       dockerfile: ./docker/node.dockerfile
-    network_mode: "host"
+    #network_mode: "host"
+    networks:
+      - my-network
+    ports:
+      - "8080:3000"
     environment:
+      PORT: 3000
       TERM: xterm
       PUPPETEER_EXECUTABLE_PATH: /app/puppeteer/chrome/linux-119.0.6045.105/chrome-linux64/chrome
+    volumes:
+      - ./texts:/app/texts
+  ranking:
+    networks:
+      - my-network
+    ports:
+      - "6969:6969"
+    image: semantic/ranking
+    container_name: ranking
+    build:
+      context: ../
+      dockerfile: ./docker/ranking.dockerfile
+    volumes:
+      - ./texts:/app/texts
+    depends_on:
+      - postgres
 
 networks:
   my-network:
+
 

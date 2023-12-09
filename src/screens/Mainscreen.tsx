@@ -7,7 +7,7 @@ import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
 import { TimeoutWrapper } from '../TypesAndLogic/timeoutExtender'
 
-export type PdfData = {
+export type pdfObject = {
   url: string;
   title: string;
   author: string;
@@ -15,10 +15,10 @@ export type PdfData = {
   relevance: number;
 };
 
-export type PdfObjects = PdfData[];
+export type PdfObjectArray = pdfObject[];
 
 const Mainscreen = () => {
-  const [PdfObjects, setPdfObjects] = useState<PdfData[]>([]);
+  const [PdfObjects, setPdfObjects] = useState<pdfObject[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
@@ -60,13 +60,30 @@ const Mainscreen = () => {
     };
 
     try {
+
         const response = await TimeoutWrapper(options);
         console.log(searchParams);
         console.log(JSON.stringify({ "query": searchParams }));
+// =======
+// <!--       const response = await fetch(`/search`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ "query": searchParams }),
+//       }); -->
+// >>>>>>> bmf
       if (!response.ok) {
         alert("ERR" + response.status);
       } else {
-        console.log(await response.json());
+        response.json()
+          .then((data) => {
+            console.log("Changing Data");
+            console.log(JSON.stringify(data));
+            //"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score
+            setPdfObjects(data.map((element: any) => { return { "url": element.URL, "date": element.TimeStamp, "relevance": element.Score, "title": element.Title } }));
+            setLoading(false);
+          });
+
+
       }
     } catch (err) {
       alert(err);
