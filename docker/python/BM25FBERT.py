@@ -116,21 +116,21 @@ class BM25F_and_BERT(BM25F):
         self.tokenizer = BertTokenizer.from_pretrained(bert_model_name)
     
     #Function which generate BERT embedding of a text. Used to generate BERT embedding of query and document.
-    def calculate_bert_embedding(self, docArray):
+    def calculate_bert_embedding(self, docArray, isQuery = False):
         global logger
         # Combine title and body into a single string for each document        
-        document_texts = []#[" ".join(doc["title"] + doc["body"]) for doc in docArray]
+        #document_texts = []#[" ".join(doc["title"] + doc["body"]) for doc in docArray]
         for input_doc in docArray:
             #logger.info("INPUT_DOC")
             #logger.info(input_doc)
-            document_texts.append("".join(input_doc["title"] + input_doc["body"]))
+            input_doc["text"] = "".join(input_doc["title"] + input_doc["body"])
+            #document_texts.append("".join(input_doc["title"] + input_doc["body"]))
 
         # Tokenize and calculate BERT embedding for each document
-        embeddings = []
-        for text in document_texts:
+        for doc in docArray:
             # Split text into chunks of max_seq_length tokens
             max_seq_length = self.tokenizer.model_max_length
-            chunks = [text[i:i+max_seq_length] for i in range(0, len(text), max_seq_length)]
+            chunks = [doc["text"][i:i+max_seq_length] for i in range(0, len(doc["text"]), max_seq_length)]
             # Calculate BERT embedding for each chunk
             chunk_embeddings = []
             for chunk in chunks:
@@ -144,21 +144,27 @@ class BM25F_and_BERT(BM25F):
                 chunk_embeddings.append(outputs[0][0][0].numpy())
             # Aggregate embeddings for the entire document
             #logger.info("Adding embedding")
-            embeddings.append(np.mean(chunk_embeddings, axis=0))
-        return embeddings
+            if isQuery:
+                return np.mean(chunk_embeddings, axis=0)
+            else:
+                doc["embedding"] = np.mean(chunk_embeddings, axis=0)
+                doc["text"] = ""
+            #embeddings.append(np.mean(chunk_embeddings, axis=0))
+        #return embeddings
 
 
     #Function to calculate and return BERT score. 
-    def calculate_bert_score(self, query, embeddings):
+    def calculate_bert_score(self, query):
         global logger
         global nr_of_fields
-        query_embedding = self.calculate_bert_embedding([{"title": query['query'], "body": ""}])[0]
+        query_embedding = self.calculate_bert_embedding([{"title": query['query'], "body": ""}], True)
         scores = []
         for index, doc in enumerate(self.docArray):
             scores.append(0.0)
             #logger.info("Embeddings")
-            #logger.info(embeddings)
-            similarity = self.calculate_cosine_similarity(query_embedding, embeddings[index])
+            #logger.info(doc["embedding"][index])
+            #logger.info(embeddings[index])
+            similarity = self.calculate_cosine_similarity(query_embedding, doc["embedding"])
 
             counter = 0
             document_length = 0
@@ -167,8 +173,10 @@ class BM25F_and_BERT(BM25F):
                 if counter > nr_of_fields:
                     break
                 document_length += len(doc[field][0])
-
-            normalized_bert_score = similarity / document_length
+            logger.info(doc["title"][0])
+            #TODO Consider the right formula here
+            normalized_bert_score = similarity / ( document_length/(document_length*1.45+document_length**1.01))
+            logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
 
             counter = 0
             for field in doc:
@@ -186,12 +194,14 @@ class BM25F_and_BERT(BM25F):
         magnitude2 = math.sqrt(sum(b**2 for b in vector2))
         if magnitude1 == 0 or magnitude2 == 0:
             return 0.0
+        logger.info("Similarity")
+        logger.info(dot_product / (magnitude1 * magnitude2))
         return dot_product / (magnitude1 * magnitude2)
 
     #Function which ranks docArray using both BM25F and BERT in a combined score, and appends it to each document.
-    def rank_documents_BM25AndBert(self, query, docArray, embeddings, split_documents):
+    def rank_documents_BM25AndBert(self, query, docArray, split_documents):
         document_scores = []
-        scores_bert = self.calculate_bert_score(query, embeddings)
+        scores_bert = self.calculate_bert_score(query)
         for index, document in enumerate(docArray):
             total_score_bm25f = 0.0
             
@@ -280,7 +290,7 @@ class Ranking:
                 self.docArray.append({"title" : [row[0]], "body": [file.read()], "url": row[1], "pdfPath": row[2], "timeStamp": row[5]})
                 
         logger.info("Documents: Amount of Documents: " + str(len(self.docArray)))
-        #self.docArray = [{"title": ["Skrr skbidi"], "body": ["Barack Osams"]}, {"title": ["skrr skbidi"], "body": ["Barack Osams and the Queen"]}]
+
         logger.info("Documents: Splitting... ")
         self.split_documents = []
         for doc in self.docArray:
@@ -290,7 +300,8 @@ class Ranking:
         logger.info("Documents: Processing.... This will take a while ")
         if len(self.docArray) > 0:
             self.bm25f_bert_instance = BM25F_and_BERT(self.docArray, self.field_weights)
-            self.bert_documents_embeddings = self.bm25f_bert_instance.calculate_bert_embedding(self.docArray)
+            #self.bert_documents_embeddings =
+            self.bm25f_bert_instance.calculate_bert_embedding(self.docArray)
             is_model_ready = True
         else:
             is_model_ready = False
@@ -302,7 +313,7 @@ class Ranking:
         return {"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score, "TimeStamp": doc.get("timeStamp")}
 
     def handle_request(self, query):
-        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray, self.bert_documents_embeddings, self.split_documents)
+        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray, self.split_documents)
         #test_instance = TestBM25FBERT()
 
         #test_instance.test_rank_documents_with_bert(result)   
