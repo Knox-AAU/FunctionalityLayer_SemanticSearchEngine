@@ -1,7 +1,8 @@
 import { IncomingMessage as Request, ServerResponse as Response } from 'http';
-import { determineMimeType, getPostData, TimeoutWrapper } from '../serverHelpers';
+import { determineMimeType, getPostData } from '../serverHelpers';
 import { errorResponse } from '../responseHandlers';
 import { llamaUrl } from '../../app';
+import { TimeoutWrapper } from '../timeoutExtender';
 
 type queryRequest = {
     query: string,

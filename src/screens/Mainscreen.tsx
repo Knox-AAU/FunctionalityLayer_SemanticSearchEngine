@@ -5,6 +5,7 @@ import ChatComponent from '../Components/ChatComponent';
 import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
+import { TimeoutWrapper } from '../TypesAndLogic/timeoutExtender'
 
 export type PdfData = {
   url: string;
@@ -50,14 +51,18 @@ const Mainscreen = () => {
     setLoading(true);
     setError(null);
 
+    const options = {
+      url: '/search',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(searchParams),
+      timeout: 720000,
+    };
+
     try {
+        const response = await TimeoutWrapper(options);
         console.log(searchParams);
         console.log(JSON.stringify({ "query": searchParams }));
-        const response = await fetch(`/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(searchParams),
-      });
       if (!response.ok) {
         alert("ERR" + response.status);
       } else {
