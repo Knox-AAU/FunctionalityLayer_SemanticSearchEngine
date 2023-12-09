@@ -1,7 +1,5 @@
 
 
-
-
 type tripleResponse = 
     {
        triples: [
@@ -30,7 +28,7 @@ export async function fetch_TripleFromGraph(subject: string | null, object: stri
     const predParam = predicate != null ? "&p=" + predicate : "";
     const graphURL = `http://knox-proxy01.srv.aau.dk/knox-api/triples?g=http://knox_database${subParam}${objParam}${predParam}`
     
-    console.log("\nlets fetch the triple from knowledge graph: ");
+    console.log("\nfetching the triple from knowledge graph: ");
     console.log("url: "+graphURL);
        const response = await fetch(graphURL, {
             method: "GET",

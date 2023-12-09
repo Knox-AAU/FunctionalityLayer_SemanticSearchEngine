@@ -23,25 +23,27 @@ type choices = {
     "text": string
 }
 
-export function regexWordExtractor(sentence: string): any[] {
+export function regexWordExtractor(sentence: string): string[] {
     const subjectRegex = /Subject:\s*(.*)($|\n|\()/;
     const objectRegex = /Object:\s*(.*)($|\n|\()/;
     const predicateRegex = /Predicate:\s*(.*)($|\n|\()/;
 
     const subjectMatches = sentence.match(subjectRegex);
-    const subjectWord = subjectMatches != null && subjectMatches.length > 0 && subjectMatches[1] !== "null" ? subjectMatches[1] : null;
-
+    const subjectWord = subjectMatches != null && subjectMatches.length > 0 && subjectMatches[1] !== "null" ? subjectMatches[1] : '';
+    
     const objectMatches = sentence.match(objectRegex);
-    const objectWord = objectMatches != null && objectMatches.length > 0 && objectMatches[1] !== "null" ? objectMatches[1] : null;
+    const objectWord = objectMatches != null && objectMatches.length > 0 && objectMatches[1] !== "null" ? objectMatches[1] : '';
 
     const predicateMatches = sentence.match(predicateRegex);
-    const predicateWord = predicateMatches != null && predicateMatches.length > 0 && predicateMatches[1] !== "null" ? predicateMatches[1] : null;
+    const predicateWord = predicateMatches != null && predicateMatches.length > 0 && predicateMatches[1] !== "null" ? predicateMatches[1] : '';
 
+    // Return the results as an array of strings
     return [subjectWord, objectWord, predicateWord];
 }
 
+
 // returns an array: [subject, object, predicate]
-export async function Llama_Analyze(userQuery: string): Promise<any[]> {
+export async function Llama_Analyze(userQuery: string): Promise<string[]> {
 
     const LlamaCommand = {
         "system_message": "",
