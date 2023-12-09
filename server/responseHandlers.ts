@@ -6,6 +6,7 @@ import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 import { GrabButDataFirst } from "./responses/grabber";
 import { spoQuery } from './responses/spoGet';
 import { search } from './responses/search';
+import { resetDB } from './responses/resetDB'
 
 //Handles post requests
 export function postHandler(req: Request, res: Response) {
@@ -13,7 +14,9 @@ export function postHandler(req: Request, res: Response) {
     //const path = "Server/ServerData/CallerDB/callers" + "-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + ".json";
     console.log(req.url);
     switch (req.url) {
-        case 'client/search':
+        case 'build/reset':
+            return resetDB(req, res);
+        case 'build/search':
             return search(req, res);
         case 'client/db/getFromS':
             return spoQuery(req, res);

@@ -16,7 +16,7 @@ let _isConnected = false;
 //Check docker folder
 const client = new Client({
   user: 'defaultuser',
-  host: 'localhost',
+  host: 'postgres',
   database: 'semanticDB',
   password: '1234',
   port: 5432,

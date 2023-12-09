@@ -1,5 +1,5 @@
 import { IncomingMessage as Request, ServerResponse as Response } from 'http';
-import { getPostData } from '../serverHelpers';
+import { determineMimeType, getPostData } from '../serverHelpers';
 import { errorResponse } from '../responseHandlers';
 import { llamaUrl } from '../../app';
 
@@ -7,11 +7,15 @@ type queryRequest = {
     query: string,
 }
 
+const targetContainerHostname = 'ranking'; //  container name
+
+export const url = `http://${targetContainerHostname}:6969/`; //  portNumber and path 
+
 export function search(req: Request, res: Response) {
     getPostData(req)
         .then((data) => {
             const formattedData = data as queryRequest;
-            const request = {
+            /*const request = {
                 "system_message": "Hello There",
                 "user_message": `The sentence is "${formattedData.query}". List the subject, object and predicate in the sentence.\
                 Do it as a bulletpoint list. Do not provide any other information and do not respond with anything else other\
@@ -26,9 +30,36 @@ export function search(req: Request, res: Response) {
                 .then((response) => response.json())
                 .then((data) => {
                     console.log(data);
+                })*/
+            fetch(url + "query", {
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+                .then(async (response) => {
+                    if (response.ok) {
+                        console.log("Response OK")
+                        response.json()
+                            .then((data) => {
+                                console.log("Data")
+                                console.log(JSON.stringify(data))
+                                res.statusCode = 200;
+                                res.setHeader('Content-Type', determineMimeType(".json"));
+                                res.write(JSON.stringify(data));
+                                res.end("\n");
+                            })
+                            .catch((err) => {
+                                errorResponse(res, 500, `searcherror 1: Failed to parse response data. ${err.toString()}`);
+                            });
+                    } else {
+                        console.log("Err");
+                        errorResponse(res, response.status, `searcherror 2: Llama API returned an error status (${response.status}).`);
+                    }
                 })
+                .catch((err) => {
+                    errorResponse(res, 500, `searcherror 3: Failed to fetch data from Llama API. ${err.toString()}`);
+                });
         })
         .catch((err) => {
-            errorResponse(res, 500, "Could not contact Llama");
-        })
+            errorResponse(res, 503, `searcherror 4: Could not extract data from the request body. ${err.toString()}`);
+        });
 }
