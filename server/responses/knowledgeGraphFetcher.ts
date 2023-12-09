@@ -52,7 +52,7 @@ export async function fetch_TripleFromGraph(subject: string | null, object: stri
         
         console.log("\nthis is the node array: " + nodeArray);
         
-
+        return nodeArray;
 
         // future works: extract the URL of pdf from the response. at the time of writing, there is no URL key
         // return callRankingscript(nodeArray);
