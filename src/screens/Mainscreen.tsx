@@ -26,7 +26,7 @@ const Mainscreen = () => {
   const handleSortByDate = useCallback(() => {
     const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
     setPdfObjects(sortedPdfObjects);
-    setSortOrder((prevSortOrder) =>
+    setSortOrder((prevSortOrder: string) =>
       prevSortOrder === 'ascending' ? 'descending' : 'ascending'
     );
   }, [PdfObjects, sortOrder]);
