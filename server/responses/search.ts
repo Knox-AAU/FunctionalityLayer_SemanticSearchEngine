@@ -5,6 +5,7 @@ import { llamaUrl } from '../../app';
 import { TimeoutWrapper } from '../timeoutExtender';
 import { Llama_Analyze } from './LlamaAnalyzer';
 import { fetch_TripleFromGraph } from './knowledgeGraphFetcher';
+import { FetchPdfArray } from './fetchPDFFromDatabase';
 type queryRequest = {
     query: string,
 }
@@ -28,42 +29,11 @@ export function KNOXSearch(req: Request, res: Response){
         const nodeArray:string[]  = await fetch_TripleFromGraph(subjectWord, objectWord, predicateWord);
        
         //use nodeArray to get files from the Ranking module:
-        
-
-
+        console.log("sending - " + JSON.stringify(nodeArray) + "- to ranking script")
+        await FetchPdfArray(url, nodeArray, res)
     })
-    .catch((err) => {
-                                errorResponse(res, 500, `searcherror 1: Failed to parse response data. ${err.toString()}`);
-                            });
-                    } else {
-                        console.log("Err");
-                        errorResponse(res, response.status, `searcherror 2: Llama API returned an error status (${response.status}).`);
-                    }
-                })
-                .catch((err) => {
-                    errorResponse(res, 500, `searcherror 3: Failed to fetch data from Llama API. ${err.toString()}`);
-                });
-        })
-        .catch((err) => {
-            errorResponse(res, 503, `searcherror 4: Could not extract data from the request body. ${err.toString()}`);
-        });
-// <<<<<<< 
-//             fetch(url + "query", {
-//                 method: "POST",
-//                 body: JSON.stringify(data)
-//             })
-//                 .then(async (response) => {
-//                     if (response.ok) {
-//                         console.log("Response OK")
-//                         response.json()
-//                             .then((data) => {
-//                                 console.log("Data")
-//                                 console.log(JSON.stringify(data))
-//                                 res.statusCode = 200;
-//                                 res.setHeader('Content-Type', determineMimeType(".json"));
-//                                 res.write(JSON.stringify(data));
-//                                 res.end("\n");
-//                             })
-                            
-// >>>>>>> bmf
+   .catch((err) => {
+    errorResponse(res, 503, `searcherror 4: Could not extract data from the request body. ${err.toString()}`);
+    });
+        
 }

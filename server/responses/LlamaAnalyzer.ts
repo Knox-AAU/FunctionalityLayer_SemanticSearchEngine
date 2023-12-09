@@ -62,10 +62,19 @@ export async function Llama_Analyze(userQuery: string): Promise<string[]> {
     }
 
     // Step 4: Extract and process the response from Llama
-    const llamaResponse = await TimeoutWrapper(options);
-    console.log("Llama response: " + JSON.stringify(llamaResponse));
-    const sentence =llamaResponse.choices[0].text
+    try {
+        const llamaResponse = await TimeoutWrapper(options);
+        console.log("Llama response: " + JSON.stringify(llamaResponse));
+        const sentence = llamaResponse.choices[0].text;
         
+        // Step 5: Use regular expressions to extract subject, object, and predicate
+        const extractedInfo = regexWordExtractor(llamaResponse.choices[0].text);
+        console.log("Extracted Information: ", extractedInfo);    
+        return extractedInfo;
+    } catch (error) {
+        console.error("Error in Llama_Analyze:", error);
+        throw new Error("Failed to analyze user query.");
+    }
     // Step 5: Use regular expressions to extract subject, object, and predicate
     const extractedInfo = regexWordExtractor(llamaResponse.choices[0].text);
     console.log("Extracted Information: ", extractedInfo);    
