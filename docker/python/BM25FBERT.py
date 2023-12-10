@@ -82,19 +82,21 @@ class BM25F:
     def calculate_bm25f_score(self, query, document):
         queryArray = self.query_splitter(query)
         score = 0.0
-        document_lengths = {field: len(document[field]) for field in document}
+        #document_lengths = {field: len(document[field]) for field in document}
         #query_terms = Counter(queryArray)
         for word in queryArray:
             idf = self.calculate_idf(word)
             for i, field in enumerate(document):
-                if term not in document[field]:
-                    continue
-                term_frequency = document[field].count(term)
-                numerator = term_frequency * (self.k1 + 1)
-                denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
-                score += self.field_weights[field] * idf * (numerator / denominator)
-        logger.info("BMF")
-        logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + denominator)
+                #if term not in document[field]:
+                #    continue
+                if i >= nr_of_fields:
+                    break
+                #term_frequency = document[field].count(term)
+                #numerator = term_frequency * (self.k1 + 1)
+                #denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
+                #score += self.field_weights[field] * idf * (numerator / denominator)
+        #logger.info("BMF")
+        #logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + denominator)
         return score
 
     #Function which appends each document with BM25F score.
