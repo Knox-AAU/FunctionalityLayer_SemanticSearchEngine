@@ -6,7 +6,7 @@ import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 import { GrabButDataFirst } from "./responses/grabber";
 import { spoQuery } from './responses/spoGet';
 
-import { KNOXSearch } from "./responses/search";
+import { KNOXSearch, bertSearchDecorator } from "./responses/search";
 
 import { resetDB } from './responses/resetDB'
 
@@ -17,12 +17,12 @@ export function postHandler(req: Request, res: Response) {
     //const path = "Server/ServerData/CallerDB/callers" + "-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + ".json";
     console.log(req.url);
     switch (req.url) {
-
         case 'build/reset':
             return resetDB(req, res);
         case 'build/search':
-            return search(req, res);
-
+            return KNOXSearch(req, res);
+        case 'build/bertSearch':
+            return bertSearchDecorator(req, res);
         case 'client/db/getFromS':
             return spoQuery(req, res);
         case "build/grabUrl":

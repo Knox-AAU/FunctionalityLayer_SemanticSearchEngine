@@ -12,33 +12,33 @@ const targetContainerHostname = 'ranking'; //  container name
 
 export const url = `http://${targetContainerHostname}:6969/`; //  portNumber and path 
 
-export function KNOXSearch(req: Request, res: Response){
-   // Extract data from the request body
-   getPostData(req)  //Returns promise that retrieves post data in chunks
-   .then (async(data) => {
-        console.log("Data: " + JSON.stringify(data));
+export function KNOXSearch(req: Request, res: Response) {
+    // Extract data from the request body
+    getPostData(req)  //Returns promise that retrieves post data in chunks
+        .then(async (data: any) => {
+            console.log("Data: " + JSON.stringify(data));
 
-        //Format the data as per the Llama API request structure
-        const formattedData = data as queryRequest;
+            //Format the data as per the Llama API request structure
+            const formattedData = data as queryRequest;
 
-        // Llama_Analyze returns an array:[subject, object, predicate]
-        const llamaresult: string[] = await Llama_Analyze(formattedData.query);   
-        const subjectWord: string =llamaresult[0];
-        const objectWord: string =llamaresult[1];
-        const predicateWord: string =llamaresult[2];
-        const nodeArray:string[]  = await fetch_TripleFromGraph(subjectWord, objectWord, predicateWord);
-       
-        //use nodeArray to get files from the Ranking module:
-        console.log("nodeArray" + nodeArray);
-        bertSearch(req, res, { "query":nodeArray.join(" ") });
+            // Llama_Analyze returns an array:[subject, object, predicate]
+            const llamaresult: string[] = await Llama_Analyze(formattedData.query);
+            const subjectWord: string = llamaresult[0];
+            const objectWord: string = llamaresult[1];
+            const predicateWord: string = llamaresult[2];
+            const nodeArray: string[] = await fetch_TripleFromGraph(subjectWord, objectWord, predicateWord);
+
+            //use nodeArray to get files from the Ranking module:
+            console.log("nodeArray" + nodeArray);
+            bertSearch(req, res, { "query": nodeArray.join(" ") });
 
 
-    })
+        })
 }
 
-export function search(req: Request, res: Response) {
+export function bertSearchDecorator(req: Request, res: Response) {
     getPostData(req)
-        .then((data) => {         
+        .then((data: any) => {
             bertSearch(req, res, data);
         })
         .catch((err) => {
@@ -46,7 +46,7 @@ export function search(req: Request, res: Response) {
         });
 }
 
-export function bertSearch(req: Request, res: Response, data) {
+export function bertSearch(req: Request, res: Response, data: any) {
     fetch(url + "query", {
         method: "POST",
         body: JSON.stringify(data)
@@ -55,7 +55,7 @@ export function bertSearch(req: Request, res: Response, data) {
             if (response.ok) {
                 console.log("Response OK")
                 response.json()
-                    .then((data) => {
+                    .then((data: any) => {
                         console.log("Data")
                         console.log(JSON.stringify(data))
                         res.statusCode = 200;

@@ -37,15 +37,7 @@ const Mainscreen = () => {
   }, [PdfObjects]);
 
 
-//to do rename to use un-capped H
-  const handleSearch = async (searchParams: {
-
-    query: string;
-    publishedAfter?: string;
-    publishedBefore?: string;
-    author?: string;
-    titleSearch?: boolean;
-  }) => {
+  const handleSearch = async (searchParams: { query: string; publishedAfter?: string; publishedBefore?: string; author?: string; titleSearch?: boolean; }) => {
     setLoading(true);
     setError(null);
 
@@ -58,37 +50,24 @@ const Mainscreen = () => {
     };
 
     try {
-
-        const response = await TimeoutWrapper(options);
-        console.log(searchParams);
-        console.log(JSON.stringify({ "query": searchParams }));
-// =======
-// <!--       const response = await fetch(`/search`, {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ "query": searchParams }),
-//       }); -->
-// >>>>>>> bmf
+      const response = await TimeoutWrapper(options);
+      console.log(JSON.stringify({ "query": searchParams }));
       if (!response.ok) {
         alert("ERR" + response.status);
       } else {
         response.json()
-          .then((data) => {
+          .then((data: any) => {
             console.log("Changing Data");
             console.log(JSON.stringify(data));
             //"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score
             setPdfObjects(data.map((element: any) => { return { "url": element.URL, "date": element.TimeStamp, "relevance": element.Score, "title": element.Title } }));
             setLoading(false);
           });
-
-
       }
     } catch (err) {
       alert(err);
       console.log(err);
     }
-    
-
   }
 
   const handleChat = async (query: string) => {
