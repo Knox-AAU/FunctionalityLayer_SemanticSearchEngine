@@ -1,14 +1,16 @@
-const online = false;
+const docker = true;
 
 import * as http from 'http';
 import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 
 import * as fs from 'fs';
 
-const hostname = online ? '192.168.0.142' : 'localhost';
+const hostname = docker ? '0.0.0.0' : 'localhost';
 const port = +(process.env.PORT || 3000);
 
 import { postHandler, getHandler, fileResponse, errorResponse } from './server/responseHandlers';
+
+export const llamaUrl = "knox-proxy01.srv.aau.dk/llama-api/llama";
 
 
 //Create server object with the function requestHandler as input

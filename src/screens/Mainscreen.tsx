@@ -6,22 +6,17 @@ import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
 
+
 let navigate = useNavigate();
 const routeChange = (path: string) => {
   navigate(path);
 }
-export type PdfData = {
-  url: string;
-  title: string;
-  author: string;
-  date: string;
-  relevance: number;
-};
 
-export type PdfObjects = PdfData[];
+
+export type PdfObjectArray = pdfObject[];
 
 const Mainscreen = () => {
-  const [PdfObjects, setPdfObjects] = useState<PdfData[]>([]);
+  const [PdfObjects, setPdfObjects] = useState<pdfObject[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
@@ -55,26 +50,30 @@ const Mainscreen = () => {
     console.log(`Search Request Body: ${JSON.stringify({ searchParams })}`);
 
     try {
-      const response = await fetch(`http://search.aau.dk/api/search`, {
+      const response = await fetch(`/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(searchParams),
+        body: JSON.stringify({ "query": searchParams }),
       });
-
       if (!response.ok) {
-        setError('Failed to fetch from the API');
-        setPdfObjects(dummyData);
+        alert("ERR" + response.status);
       } else {
-        const data: PdfData[] = await response.json();
-        setPdfObjects(data);
+        response.json()
+          .then((data) => {
+            console.log("Changing Data");
+            console.log(JSON.stringify(data));
+            //"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score
+            setPdfObjects(data.map((element: any) => { return { "url": element.URL, "date": element.TimeStamp, "relevance": element.Score, "title": element.Title } }));
+            setLoading(false);
+          });
+
+
       }
-    } catch (error) {
-      setError('Failed to fetch from the API');
-      setPdfObjects(dummyData);
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      alert(err);
+      console.log(err);
     }
-  };
+  }
 
   const handleChat = async (query: string) => {
     // Log the chat request details
@@ -85,7 +84,7 @@ const Mainscreen = () => {
 
     try {
       // Send the user's query to the chatbot backend
-      const response = await fetch('http://your-chatbot-backend-url', {
+      const response = await fetch('/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

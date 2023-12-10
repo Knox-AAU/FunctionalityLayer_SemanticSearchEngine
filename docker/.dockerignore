@@ -4,3 +4,6 @@ node_modules/
 
 *.csv
 docker/localTempDB.csv
+
+*.pdf
+*.txt
