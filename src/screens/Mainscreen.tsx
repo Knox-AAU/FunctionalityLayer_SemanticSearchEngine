@@ -6,13 +6,12 @@ import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
 
-export type pdfObject = {
-  url: string;
-  title: string;
-  author: string;
-  date: string;
-  relevance: number;
-};
+
+let navigate = useNavigate();
+const routeChange = (path: string) => {
+  navigate(path);
+}
+
 
 export type PdfObjectArray = pdfObject[];
 
@@ -21,6 +20,7 @@ const Mainscreen = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
+
 
   const handleSortByDate = useCallback(() => {
     const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
@@ -35,12 +35,8 @@ const Mainscreen = () => {
     setPdfObjects(sortedPdfObjects);
   }, [PdfObjects]);
 
-  let navigate = useNavigate();
-  const routeChange = (path: string) => {
-    navigate(path);
-  }
 
-  const fetchSearchResults = async (searchParams: {
+  const handleSearch = async (searchParams: {
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -136,7 +132,7 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
-          onSearch={(searchParams) => fetchSearchResults(searchParams)}
+          onSearch={(searchParams) => handleSearch(searchParams)}
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
