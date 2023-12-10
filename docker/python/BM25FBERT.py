@@ -30,7 +30,7 @@ class BM25F:
         self.avg_field_lengths = self.calculate_avg_field_lengths()
         self.term_counts = self.calculate_term_counts()
         self.k1 = 2
-        self.b = 1
+        self.b = 100
         self.field_weights = field_weights
 
     #Calculates avgerage field lengths, which is needed to calculate denominator used for score calculation
@@ -49,22 +49,34 @@ class BM25F:
     #Calculates how many times the term appears in the document. Term count is needed to calculate inverted document frequency
     def calculate_term_counts(self):
         global nr_of_fields
-        term_counts = Counter()
+        term_counts_array = []
         for document in self.docArray:
+            termCountsObject = {}
             for i, field in enumerate(document):
+                term_counts = Counter()
                 if i >= nr_of_fields:
                     break
-                term_counts.update(document[field])
-        return term_counts
+                #for word in :
+                lowercase = document[field][0].lower()
+                term_counts.update(lowercase.split())
+                termCountsObject[field] = term_counts
+            term_counts_array.append(termCountsObject)
+        #logger.info("termCountsObject")
+        #logger.info(termCountsObject)
+        return term_counts_array
 
     #Simple function that returns inverted document frequency
-    def calculate_idf(self, term):
-        document_with_term_count = self.term_counts[term]
-        return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0)
+    def calculate_idf(self, term, field, index):
+        document_with_term_count = self.term_counts[index][field][term]
+        # logger.info("idfCalc")
+        # logger.info("self.documents_count: " + str(self.documents_count) +
+        #             "   document_with_term_count: " + str(document_with_term_count) +
+        #             "   self.term_counts" + str(self.term_counts))
+        return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0) + 1.0
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
     def query_splitter(self, query):
-        return query.split()
+        return query.lower().split()
     
     #Function which splits the document so that BM25F can properly search the document for each keyword
     def bm25f_document_split(document):
@@ -82,21 +94,24 @@ class BM25F:
     def calculate_bm25f_score(self, query, document):
         queryArray = self.query_splitter(query)
         score = 0.0
-        #document_lengths = {field: len(document[field]) for field in document}
+        document_lengths = {field: len(document[field]) for field in document}
         #query_terms = Counter(queryArray)
         for word in queryArray:
-            idf = self.calculate_idf(word)
             for i, field in enumerate(document):
-                #if term not in document[field]:
-                #    continue
+                if word not in self.term_counts[i][field]:
+                    logger.info("Not in")
+                    continue
+                logger.info("in, idf:")
+                idf = self.calculate_idf(word, field, i)
+                logger.info(idf)
                 if i >= nr_of_fields:
                     break
-                #term_frequency = document[field].count(term)
-                #numerator = term_frequency * (self.k1 + 1)
-                #denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
-                #score += self.field_weights[field] * idf * (numerator / denominator)
-        #logger.info("BMF")
-        #logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + denominator)
+                term_frequency = document[field].count(word)
+                numerator = term_frequency * (self.k1 + 1)
+                denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
+                score += self.field_weights[field] * idf * (numerator / denominator)
+                logger.info("BMF")
+                logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + str(denominator))
         return score
 
     #Function which appends each document with BM25F score.
@@ -200,7 +215,9 @@ class BM25F_and_BERT(BM25F):
     def calculate_bert_score(self, query):
         global logger
         global nr_of_fields
-        query_embedding = self.calculate_bert_embedding([{"title": query['query'], "body": ""}], True)
+        logger.info("Query")
+        logger.info(query)
+        query_embedding = self.calculate_bert_embedding([{"title": query, "body": ""}], True)
         scores = []
         for index, doc in enumerate(self.docArray):
             scores.append(0.0)
@@ -275,12 +292,13 @@ class BM25F_and_BERT(BM25F):
             #for word in query['query'].split(" "):
                 #logger.info("Split")
                 #logger.info(split_documents)
-            score_bm25f = self.calculate_bm25f_score(query['query'], split_documents[index])
+            score_bm25f = self.calculate_bm25f_score(query, split_documents[index])
             total_score_bm25f += score_bm25f
 
             # Calculate BERT score for the entire query
-            
-            
+            logger.info("Scores")
+            logger.info(total_score_bm25f)
+            logger.info(scores_bert[index])
             # Combine BM25F and BERT scores
             combined_score = scores_bert[index]#total_score_bm25f# + scores_bert[index]
             document_scores.append((document, combined_score))

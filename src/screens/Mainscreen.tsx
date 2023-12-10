@@ -152,6 +152,7 @@ const Mainscreen = () => {
 			<div className="Searchcomponent">
 				<SearchBarComponent
 					onSearch={(searchParams) => handleSearch(searchParams)}
+          onBertSearch={(searchParams) => handleBertSearch(searchParams)}
 					onSortByDate={handleSortByDate}
 					onSortByRelevance={handleSortByRelevance}
 					sortOrder={sortOrder}
