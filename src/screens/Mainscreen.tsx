@@ -6,22 +6,22 @@ import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
 import { TimeoutWrapper } from '../TypesAndLogic/timeoutExtender'
+import { pdfObjectArray } from '../TypesAndLogic/Types';
+import { pdfObject } from '../TypesAndLogic/Types';
 
-export type pdfObject = {
-  url: string;
-  title: string;
-  author: string;
-  date: string;
-  relevance: number;
-};
 
-export type PdfObjectArray = pdfObject[];
+
 
 const Mainscreen = () => {
+  let navigate = useNavigate();
+  const routeChange = (path: string) => {
+    navigate(path);
+  }
   const [PdfObjects, setPdfObjects] = useState<pdfObject[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
+
 
   const handleSortByDate = useCallback(() => {
     const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
@@ -36,12 +36,10 @@ const Mainscreen = () => {
     setPdfObjects(sortedPdfObjects);
   }, [PdfObjects]);
 
-  let navigate = useNavigate();
-  const routeChange = (path: string) => {
-    navigate(path);
-  }
 
-  const HandleSearch = async (searchParams: {
+//to do rename to use un-capped H
+  const handleSearch = async (searchParams: {
+
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -150,7 +148,9 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
-          onSearch={(searchParams) => HandleSearch(searchParams)}
+
+          onSearch={(searchParams) => handleSearch(searchParams)}
+
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
