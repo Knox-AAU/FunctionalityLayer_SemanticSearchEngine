@@ -5,6 +5,7 @@ import ChatComponent from '../Components/ChatComponent';
 import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
+import { TimeoutWrapper } from '../TypesAndLogic/timeoutExtender'
 import { pdfObjectArray } from '../TypesAndLogic/Types';
 import { pdfObject } from '../TypesAndLogic/Types';
 
@@ -25,7 +26,7 @@ const Mainscreen = () => {
   const handleSortByDate = useCallback(() => {
     const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
     setPdfObjects(sortedPdfObjects);
-    setSortOrder((prevSortOrder) =>
+    setSortOrder((prevSortOrder: string) =>
       prevSortOrder === 'ascending' ? 'descending' : 'ascending'
     );
   }, [PdfObjects, sortOrder]);
@@ -36,7 +37,9 @@ const Mainscreen = () => {
   }, [PdfObjects]);
 
 
+//to do rename to use un-capped H
   const handleSearch = async (searchParams: {
+
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -45,16 +48,27 @@ const Mainscreen = () => {
   }) => {
     setLoading(true);
     setError(null);
-    console.log(`Search Request URL: http://search.aau.dk/api/search`);
-    console.log(`Search Request Method: POST`);
-    console.log(`Search Request Body: ${JSON.stringify({ searchParams })}`);
+
+    const options = {
+      url: '/search',
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(searchParams),
+      timeout: 720000,
+    };
 
     try {
-      const response = await fetch(`/search`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "query": searchParams }),
-      });
+
+        const response = await TimeoutWrapper(options);
+        console.log(searchParams);
+        console.log(JSON.stringify({ "query": searchParams }));
+// =======
+// <!--       const response = await fetch(`/search`, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ "query": searchParams }),
+//       }); -->
+// >>>>>>> bmf
       if (!response.ok) {
         alert("ERR" + response.status);
       } else {
@@ -73,6 +87,8 @@ const Mainscreen = () => {
       alert(err);
       console.log(err);
     }
+    
+
   }
 
   const handleChat = async (query: string) => {
@@ -132,7 +148,9 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
+
           onSearch={(searchParams) => handleSearch(searchParams)}
+
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
