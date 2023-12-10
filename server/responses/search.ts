@@ -11,6 +11,7 @@ type queryRequest = {
 const targetContainerHostname = 'ranking'; //  container name
 
 export const url = `http://${targetContainerHostname}:6969/`; //  portNumber and path 
+
 export function KNOXSearch(req: Request, res: Response){
    // Extract data from the request body
    getPostData(req)  //Returns promise that retrieves post data in chunks
@@ -28,42 +29,49 @@ export function KNOXSearch(req: Request, res: Response){
         const nodeArray:string[]  = await fetch_TripleFromGraph(subjectWord, objectWord, predicateWord);
        
         //use nodeArray to get files from the Ranking module:
-        
+        console.log("nodeArray" + nodeArray);
+        bertSearch(req, res, { "query":nodeArray.join(" ") });
 
 
     })
-    .catch((err) => {
-                                errorResponse(res, 500, `searcherror 1: Failed to parse response data. ${err.toString()}`);
-                            });
-                    } else {
-                        console.log("Err");
-                        errorResponse(res, response.status, `searcherror 2: Ranker-script returned an error status (${response.status}).`);
-                    }
-                })
-                .catch((err) => {
-                    errorResponse(res, 500, `searcherror 3: couldnt connect to python container, is it running?. ${err.toString()}`);
-                });
+}
+
+export function search(req: Request, res: Response) {
+    getPostData(req)
+        .then((data) => {         
+            bertSearch(req, res, data);
         })
         .catch((err) => {
             errorResponse(res, 503, `searcherror 4: Could not extract data from the request body. ${err.toString()}`);
         });
-// <<<<<<< 
-//             fetch(url + "query", {
-//                 method: "POST",
-//                 body: JSON.stringify(data)
-//             })
-//                 .then(async (response) => {
-//                     if (response.ok) {
-//                         console.log("Response OK")
-//                         response.json()
-//                             .then((data) => {
-//                                 console.log("Data")
-//                                 console.log(JSON.stringify(data))
-//                                 res.statusCode = 200;
-//                                 res.setHeader('Content-Type', determineMimeType(".json"));
-//                                 res.write(JSON.stringify(data));
-//                                 res.end("\n");
-//                             })
-                            
-// >>>>>>> bmf
+}
+
+export function bertSearch(req: Request, res: Response, data) {
+    fetch(url + "query", {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+        .then(async (response) => {
+            if (response.ok) {
+                console.log("Response OK")
+                response.json()
+                    .then((data) => {
+                        console.log("Data")
+                        console.log(JSON.stringify(data))
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', determineMimeType(".json"));
+                        res.write(JSON.stringify(data));
+                        res.end("\n");
+                    })
+                    .catch((err) => {
+                        errorResponse(res, 500, `searcherror 1: Failed to parse response data. ${err.toString()}`);
+                    });
+            } else {
+                console.log("Err");
+                errorResponse(res, response.status, `searcherror 2: Ranker-script returned an error status (${response.status}).`);
+            }
+        })
+        .catch((err) => {
+            errorResponse(res, 500, `searcherror 3: couldnt connect to python container, is it running?. ${err.toString()}`);
+        });
 }
