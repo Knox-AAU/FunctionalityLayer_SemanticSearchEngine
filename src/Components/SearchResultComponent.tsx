@@ -1,6 +1,6 @@
 import React from 'react';
-import { PdfObjectArray } from '../screens/Mainscreen';
-import { pdfObject } from '../screens/Mainscreen';
+// import { PdfObjectArray } from '../TypesAndLogic/Types';
+import { pdfObject } from  '../TypesAndLogic/Types';
 
 const SearchResultComponent = ({ PdfObjects }: { PdfObjects: pdfObject[] }) => {
 

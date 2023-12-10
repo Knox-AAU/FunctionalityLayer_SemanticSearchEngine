@@ -5,17 +5,17 @@ import ChatComponent from '../Components/ChatComponent';
 import SearchResultComponent from '../Components/SearchResultComponent';
 import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
+import { pdfObjectArray } from '../TypesAndLogic/Types';
+import { pdfObject } from '../TypesAndLogic/Types';
 
 
-let navigate = useNavigate();
-const routeChange = (path: string) => {
-  navigate(path);
-}
 
-
-export type PdfObjectArray = pdfObject[];
 
 const Mainscreen = () => {
+  let navigate = useNavigate();
+  const routeChange = (path: string) => {
+    navigate(path);
+  }
   const [PdfObjects, setPdfObjects] = useState<pdfObject[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
