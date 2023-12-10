@@ -5,10 +5,15 @@ import torch
 import numpy as np
 import sys
 
+import http.server
+import socketserver
+import json
+from urllib.parse import parse_qs
+import unittest
+import requests
 
-#File contains both the class BM25F and BM25FBERT. BM25FBERT is a subclass of BM25F, 
-# but it is possible to rewrite the class to not inherit from BM25F. However, BM25F is kept as a 
-# complete class incase future work needs it. Same goes for function to score documents.
+#File contains both the class BM25F and BM25FBERT. BM25FBERT is a subclass of BM25F, but it is possible to rewrite the class to not inherit from BM25F. However, BM25F is kept as a complete class incase future work needs it. Same goes for function to score documents.
+
 class BM25F:
     #Initialize BM25F to be used for function calculate_bm25f_score in the class. Tweak k1 and b for better performing BM25F.
     def __init__(self, documents, field_weights):
@@ -41,17 +46,21 @@ class BM25F:
         document_with_term_count = self.term_counts[term]
         return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0)
 
+    #Function which splits a string so that BM25F can search the document for each keyword in query
+
     def bm25f_query_split(self, query):
         query_string = query[0]
         query_words = query_string.split()
         return query_words
     
+
     def bm25f_document_split(self, document):
         split_title = document["title"][0].split()
         split_body = document["body"][0].split()
 
         title_with_commas = ", ".join(split_title)
         body_with_commas = ", ".join(split_body)
+
 
         split_document = {
         "title": title_with_commas,
@@ -77,6 +86,7 @@ class BM25F:
             for field in document:
                 if term not in document[field]:
                     continue
+
 
                 term_frequency = document[field].count(term)
                 numerator = term_frequency * (self.k1 + 1)
@@ -107,7 +117,7 @@ class BM25F_and_BERT(BM25F):
     def calculate_bert_embedding(self, documents):
         # Combine title and body into a single string for each document
         document_texts = [" ".join(doc["title"] + doc["body"]) for doc in documents]
-    
+
         # Tokenize and calculate BERT embedding for each document
         embeddings = []
         for text in document_texts:
@@ -140,6 +150,7 @@ class BM25F_and_BERT(BM25F):
         document_embedding = self.calculate_bert_embedding([document])[0]
         score = 0.0
 
+
         # Calculate cosine similarity between query and document embeddings
         similarity = self.calculate_cosine_similarity(query_embedding, document_embedding)
 
@@ -150,6 +161,7 @@ class BM25F_and_BERT(BM25F):
         for field in document:
             field_weight = self.field_weights.get(field, 1.0)
             score += field_weight * normalized_bert_score
+
 
         return score
 
@@ -169,15 +181,18 @@ class BM25F_and_BERT(BM25F):
         if documents is None:
             documents = self.documents
 
+
         document_scores = []
 
         for document in documents:
             total_score_bm25f = 0.0
 
+
             # Calculate BM25F score for each word in the query
             for word in query:
                 score_bm25f = self.calculate_bm25f_score([word], document)
                 total_score_bm25f += score_bm25f
+
 
             # Calculate BERT score for the entire query
             score_bert = self.calculate_bert_score(query, document)
@@ -191,6 +206,97 @@ class BM25F_and_BERT(BM25F):
         ranked_documents = sorted(document_scores, key=lambda x: x[1], reverse=True)
         return ranked_documents
     
+
+class TestBM25FBERT(unittest.TestCase):
+    def test_rank_documents_with_bert(self, result):
+        for item in result:
+            self.assertIsInstance(result, list, "Result is not a list")
+            # Ensure each tuple has two elements: a document and a score
+            self.assertEqual(len(item), 2)
+            doc, score = item
+            # Ensure the document is a dictionary
+            self.assertIsInstance(doc, dict)
+            # Ensure the score is a float
+            self.assertIsInstance(score, float)
+            # Ensure the document has the expected fields
+            self.assertIn("title", doc)
+            self.assertIn("body", doc)
+class Ranking:
+    def __init__(self):
+        self.field_weights = {"title": 0.05, "body": 0.95}
+        #Load search query from SPOIdentifier.py and splits into individual words
+        #self.query = ["Who served as first lady of the United States in 2021?"]
+        
+        self.documents = [{"title": ["Skrr skbidi"], "body": ["Barack Osams"]}, {"title": ["skrr skbidi"], "body": ["Barack Osams and the Queen"]}]
+
+        self.bm25f_bert_instance = BM25F_and_BERT(self.documents, self.field_weights)
+
+    @staticmethod
+    def Trim(item):
+        doc, score = item
+        return {"URL": doc.get("URL"), "Title": doc.get("title"), "Score": score}
+
+    def handle_request(self, query):
+        result = self.bm25f_bert_instance.rank_documents_bert(query, self.documents)
+        test_instance = TestBM25FBERT()
+
+        test_instance.test_rank_documents_with_bert(result)   
+        combined_json_top_10_results = map(self.Trim, result[0:10])
+        return list(combined_json_top_10_results)
+
+class RequestHandler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        print("Initializing RequestHandler")
+        # Call the __init__ method of the base class
+        super().__init__(*args, **kwargs)
+        # Create an instance of Ranking when the server starts
+        self.ranking_handler = Ranking()
+
+    def do_GET(self):
+        # Hardcoded query for testing; you can extract it from the request if needed
+        query = ["Who served as first lady of the United States in 2021?"]
+        # Handle the ranking request
+        result = ranking_handler.handle_request(query)
+
+        # Send the response
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+
+        # Convert the result to JSON and send it
+        response = json.dumps(result).encode('utf-8')
+        self.wfile.write(response)
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        query = json.loads(post_data.decode('utf-8')).get('query', '')
+
+        # Handle the query using the instance of Ranking
+        result = ranking_handler.handle_request(query)
+
+        # Send the response
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+
+        # Convert the result to JSON and send it
+        response = json.dumps(result).encode('utf-8')
+        self.wfile.write(response)
+
+if __name__ == "__main__":
+    # Debugging print statements
+    print("Creating HTTP server")
+    port = 6969
+    directory = '.'
+    httpd = socketserver.TCPServer(("", port), RequestHandler)
+    print(f"Serving on port {port}")
+    ranking_handler = Ranking()
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer terminated by user.")
+
 
 #def BM25FRank():
     #field_weights = {"title": 0.8, "body": 0.2}
@@ -250,3 +356,4 @@ class Ranking():
 
 if __name__ == "__main__":
     Ranking()
+
