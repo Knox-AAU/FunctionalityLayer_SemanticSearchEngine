@@ -13,14 +13,14 @@ COPY ./.puppeteerrc.cjs ./
 COPY ./package.json ./
 
 USER root
-RUN chown -R pptruser:pptruser /app/package.json \
-    && chown -R pptruser:pptruser /app
+#RUN chown -R pptruser:pptruser /app/package.json \
+    #&& chown -R pptruser:pptruser /app
 
-USER pptruser
+#USER pptruser
 RUN npm i
 
 USER root
-RUN chown -R pptruser:pptruser /app
+#RUN chown -R pptruser:pptruser /app
 
 RUN apt-get update \
     && apt-get install -y wget gnupg \
@@ -33,14 +33,14 @@ RUN apt-get update \
 
 USER root
 COPY "../" ./
-RUN chown -R pptruser:pptruser /app
+#RUN chown -R pptruser:pptruser /app
 RUN mkdir -p /app/texts/pdfs
 RUN mkdir -p /app/texts/strings
-RUN chown -R pptruser:root /app/texts/
+#RUN chown -R pptruser:root /app/texts/
 
 #ENV PORT=3000
 
 #EXPOSE 3000
 
-USER pptruser
+#USER pptruser
 CMD [ "npm", "run", "server" ]

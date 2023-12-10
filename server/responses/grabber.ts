@@ -57,7 +57,7 @@ const insertIntoDB = async (entryPromise: Promise<dbEntry>, req: Request, res: R
 
     return 0;
   } catch (err) {
-    return errorResponse(res, 500, err.toString());
+    return errorResponse(res, 500, "PG: " + err.toString());
   }
 
 }

@@ -24,9 +24,9 @@ services:
     networks:
       - my-network
     ports:
-      - "8080:3000"
+      - "8080:80"
     environment:
-      PORT: 3000
+      PORT: 80
       TERM: xterm
       PUPPETEER_EXECUTABLE_PATH: /app/puppeteer/chrome/linux-119.0.6045.105/chrome-linux64/chrome
     volumes:
@@ -48,5 +48,4 @@ services:
 
 networks:
   my-network:
-
-
+    driver: bridge
