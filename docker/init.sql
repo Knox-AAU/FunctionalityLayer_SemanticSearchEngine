@@ -14,8 +14,6 @@ CREATE TABLE IF NOT EXISTS spoTable (
     O VARCHAR(2143)
 );
 
-\copy spoTable FROM '/docker-entrypoint-initdb.d/localTempDB.csv' WITH (FORMAT CSV, HEADER true, DELIMITER ',');
-
 
 -- Create a user
 CREATE USER defaultuser WITH PASSWORD '1234';
@@ -23,3 +21,5 @@ CREATE USER defaultuser WITH PASSWORD '1234';
 -- Grant insert and select permissions on the table to the user
 GRANT INSERT, SELECT ON pdfTable TO defaultuser;
 GRANT INSERT, SELECT ON spoTable TO defaultuser;
+
+\copy spoTable FROM '/docker-entrypoint-initdb.d/localTempDB.csv' WITH (FORMAT CSV, HEADER true, DELIMITER ',');

@@ -235,7 +235,7 @@ class BM25F_and_BERT(BM25F):
                 }
             else:
                 normalized_bert_score = self.calculateNormalizredBert(similarity, document_length)
-            #logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
+            logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
             #logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
             if bert_field_weight:
                 for i, field in enumerate(doc):
@@ -249,7 +249,7 @@ class BM25F_and_BERT(BM25F):
 
     def calculateNormalizredBert(self, similarity, document_length, weight=1):
         #TODO Consider what the right formula is here
-        weight = 1
+        # weight = 1
         return similarity / ( (document_length/(document_length*1.45+document_length**1.01)) * weight)
     
     

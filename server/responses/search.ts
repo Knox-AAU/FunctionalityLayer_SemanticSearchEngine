@@ -52,11 +52,11 @@ export function search(req: Request, res: Response) {
                             });
                     } else {
                         console.log("Err");
-                        errorResponse(res, response.status, `searcherror 2: Llama API returned an error status (${response.status}).`);
+                        errorResponse(res, response.status, `searcherror 2: Ranker-script returned an error status (${response.status}).`);
                     }
                 })
                 .catch((err) => {
-                    errorResponse(res, 500, `searcherror 3: Failed to fetch data from Llama API. ${err.toString()}`);
+                    errorResponse(res, 500, `searcherror 3: couldnt connect to python container, is it running?. ${err.toString()}`);
                 });
         })
         .catch((err) => {
