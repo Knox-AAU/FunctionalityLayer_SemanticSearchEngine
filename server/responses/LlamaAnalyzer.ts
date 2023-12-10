@@ -27,24 +27,24 @@ export function regexWordExtractor(sentence: string): string[] {
 	const subjectMatches = sentence.match(subjectRegex);
 	const subjectWord =
 		subjectMatches != null &&
-		subjectMatches.length > 0 &&
-		subjectMatches[1] !== 'null'
+			subjectMatches.length > 0 &&
+			subjectMatches[1] !== 'null'
 			? subjectMatches[1]
 			: '';
 
 	const objectMatches = sentence.match(objectRegex);
 	const objectWord =
 		objectMatches != null &&
-		objectMatches.length > 0 &&
-		objectMatches[1] !== 'null'
+			objectMatches.length > 0 &&
+			objectMatches[1] !== 'null'
 			? objectMatches[1]
 			: '';
 
 	const predicateMatches = sentence.match(predicateRegex);
 	const predicateWord =
 		predicateMatches != null &&
-		predicateMatches.length > 0 &&
-		predicateMatches[1] !== 'null'
+			predicateMatches.length > 0 &&
+			predicateMatches[1] !== 'null'
 			? predicateMatches[1]
 			: '';
 	if (subjectWord === '' && objectWord === '' && predicateWord === '') {
@@ -60,7 +60,7 @@ export function regexWordExtractor(sentence: string): string[] {
 export async function Llama_Analyze(
 	res: Response,
 	userQuery: string
-): Promise<string[]> {
+): Promise<string[] | null> {
 	console.log('2.1, userquery is ' + userQuery);
 	const LlamaCommand = {
 		system_message: '',
@@ -88,13 +88,17 @@ export async function Llama_Analyze(
 			return response.json();
 		})
 		.then((data) => {
+			if (!data || data.choices || data.choices[0] || data.choices[0].text) {
+				errorResponse(res, 500, "Invalid response from Llama");
+				return null;
+			}
 			console.log('2.5');
 			const extractedInfo = regexWordExtractor(data.choices[0].text);
 			return extractedInfo;
 		})
 		.catch((err) => {
 			console.log(err);
-			errorResponse(res, 500, err);
-			return [''];
+			errorResponse(res, 500, err.toString());
+			return null;
 		});
 }

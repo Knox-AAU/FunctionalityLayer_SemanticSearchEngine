@@ -23,10 +23,11 @@ export function KNOXSearch(req: Request, res: Response) {
 			const formattedData = data as queryRequest;
 			console.log('2');
 			// Llama_Analyze returns an array:[subject, object, predicate]
-			const llamaresult: string[] = await Llama_Analyze(
+			const llamaresult: string[] | null = await Llama_Analyze(
 				res,
 				formattedData.query
 			);
+			if (!llamaresult) return;
 			console.log('3');
 			const subjectWord: string = llamaresult[0];
 			console.log('4');
@@ -34,11 +35,13 @@ export function KNOXSearch(req: Request, res: Response) {
 			console.log('5');
 			const predicateWord: string = llamaresult[2];
 			console.log('6');
-			const nodeArray: string[] = await fetch_TripleFromGraph(
+			const nodeArray: string[] | null = await fetch_TripleFromGraph(
+				res,
 				subjectWord,
 				objectWord,
 				predicateWord
 			);
+			if (!nodeArray) return;
 			console.log('7');
 			//use nodeArray to get files from the Ranking module:
 			console.log('nodeArray' + nodeArray);
