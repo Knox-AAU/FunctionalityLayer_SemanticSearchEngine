@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:latest
-    container_name: postgresPdfDB
+    container_name: semanticDB
     environment:
       POSTGRES_DB: semanticDB
       POSTGRES_USER: admin
@@ -20,6 +20,11 @@ services:
     build:
       context: ../
       dockerfile: ./docker/node.dockerfile
+    network_mode: "host"
+    environment:
+      TERM: xterm
+      PUPPETEER_EXECUTABLE_PATH: /app/puppeteer/chrome/linux-119.0.6045.105/chrome-linux64/chrome
 
 networks:
   my-network:
+

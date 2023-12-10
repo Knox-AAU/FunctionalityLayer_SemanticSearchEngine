@@ -16,7 +16,7 @@ let _isConnected = false;
 const client = new Client({
   user: 'defaultuser',
   host: 'localhost',
-  database: 'semanticdb',
+  database: 'semanticDB',
   password: '1234',
   port: 5432,
 });
@@ -46,8 +46,8 @@ const insertIntoDB = async (entryPromise: Promise<dbEntry>, req: Request, res: R
   const entry = await entryPromise;
   await ensureConnected(client);
 
-  const insertQuery = 'INSERT INTO pdfTable(title, url, pdfPath, author, timestamp) VALUES ($1, $2, $3, $4, $5)';
-  const values = [entry.title, entry.url, entry.pdfPath, "N/A", Date.now().toString().split('T')[0]];
+  const insertQuery = 'INSERT INTO pdfTable(title, url, pdfPath, stringPath, author, timestamp) VALUES ($1, $2, $3, $4, $5, $6)';
+  const values = [entry.title, entry.url, entry.pdfPath, entry.stringPath, "N/A", Date.now().toString().split('T')[0]];
   try {
     await client.query(insertQuery, values)
 
@@ -70,7 +70,7 @@ export const ensureConnected = async (client: Client): Promise<void> => {
 }
 
 const GrabWiki = async (url: string): Promise<dbEntry> => {
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'], });
   const page = await browser.newPage();
 
   try {
@@ -83,8 +83,8 @@ const GrabWiki = async (url: string): Promise<dbEntry> => {
 
     mkdir(pdfDir);
     mkdir(stringDir);
-    const pdfPath = `${pdfDir}/${title}.pdf`
-    const stringPath = `${stringDir}/${title}.txt`;
+    const pdfPath = `${pdfDir}${title}.pdf`
+    const stringPath = `${stringDir}${title}.txt`;
     await page.pdf({ path: pdfPath })
     await browser.close();
     fs.writeFileSync(stringPath, exploreHTMLElement(htmlContent.querySelector('div.mw-content-ltr') as HTMLElement));
