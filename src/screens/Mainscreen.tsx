@@ -7,6 +7,7 @@ import { dummyData } from '../TypesAndLogic/dummydata';
 import { useNavigate } from "react-router-dom";
 import { TimeoutWrapper } from '../TypesAndLogic/timeoutExtender'
 
+
 export type pdfObject = {
   url: string;
   title: string;
@@ -23,6 +24,7 @@ const Mainscreen = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'ascending' | 'descending'>('ascending');
 
+
   const handleSortByDate = useCallback(() => {
     const sortedPdfObjects = sortPdfObjectsByDate(PdfObjects, sortOrder);
     setPdfObjects(sortedPdfObjects);
@@ -36,12 +38,10 @@ const Mainscreen = () => {
     setPdfObjects(sortedPdfObjects);
   }, [PdfObjects]);
 
-  let navigate = useNavigate();
-  const routeChange = (path: string) => {
-    navigate(path);
-  }
+
 
   const HandleSearch = async (searchParams: {
+
     query: string;
     publishedAfter?: string;
     publishedBefore?: string;
@@ -150,7 +150,9 @@ const Mainscreen = () => {
 
       <div className='Searchcomponent'>
         <SearchBarComponent
+
           onSearch={(searchParams) => HandleSearch(searchParams)}
+
           onSortByDate={handleSortByDate}
           onSortByRelevance={handleSortByRelevance}
           sortOrder={sortOrder}
