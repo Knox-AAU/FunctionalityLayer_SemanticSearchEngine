@@ -17,6 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+bert_field_weight = True
 nr_of_fields = 2
 handler = None
 is_model_ready = False
@@ -50,10 +51,8 @@ class BM25F:
         global nr_of_fields
         term_counts = Counter()
         for document in self.docArray:
-            counter = 0
-            for field in document:
-                counter += 1
-                if counter > nr_of_fields:
+            for i, field in enumerate(document):
+                if i >= nr_of_fields:
                     break
                 term_counts.update(document[field])
         return term_counts
@@ -65,9 +64,7 @@ class BM25F:
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
     def query_splitter(self, query):
-        query_string = query[0]
-        query_words = query_string.split()
-        return query_words
+        return query.split()
     
     #Function which splits the document so that BM25F can properly search the document for each keyword
     def bm25f_document_split(document):
@@ -86,16 +83,18 @@ class BM25F:
         queryArray = self.query_splitter(query)
         score = 0.0
         document_lengths = {field: len(document[field]) for field in document}
-        query_terms = Counter(queryArray)
-        for term in query_terms:
-            idf = self.calculate_idf(term)
-            for field in document:
+        #query_terms = Counter(queryArray)
+        for word in queryArray:
+            idf = self.calculate_idf(word)
+            for i, field in enumerate(document):
                 if term not in document[field]:
                     continue
                 term_frequency = document[field].count(term)
                 numerator = term_frequency * (self.k1 + 1)
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
                 score += self.field_weights[field] * idf * (numerator / denominator)
+        logger.info("BMF")
+        logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + denominator)
         return score
 
     #Function which appends each document with BM25F score.
@@ -120,38 +119,80 @@ class BM25F_and_BERT(BM25F):
         global logger
         # Combine title and body into a single string for each document        
         #document_texts = []#[" ".join(doc["title"] + doc["body"]) for doc in docArray]
+        
         for input_doc in docArray:
+            if bert_field_weight and not isQuery:
+                input_doc["bodytext"] = input_doc["body"][0]
+                input_doc["titletext"] = input_doc["title"][0]
+            else:
+                input_doc["text"] = "".join(input_doc["title"] + input_doc["body"])
             #logger.info("INPUT_DOC")
             #logger.info(input_doc)
-            input_doc["text"] = "".join(input_doc["title"] + input_doc["body"])
             #document_texts.append("".join(input_doc["title"] + input_doc["body"]))
 
         # Tokenize and calculate BERT embedding for each document
         for doc in docArray:
             # Split text into chunks of max_seq_length tokens
             max_seq_length = self.tokenizer.model_max_length
-            chunks = [doc["text"][i:i+max_seq_length] for i in range(0, len(doc["text"]), max_seq_length)]
-            # Calculate BERT embedding for each chunk
-            chunk_embeddings = []
-            for chunk in chunks:
-                tokens = self.tokenizer.tokenize(self.tokenizer.decode(self.tokenizer.encode(chunk)))
-                indexed_tokens = self.tokenizer.convert_tokens_to_ids(tokens)
-                segments_ids = [1] * len(tokens)
-                tokens_tensor = torch.tensor([indexed_tokens])
-                segments_tensors = torch.tensor([segments_ids])
-                with torch.no_grad():
-                    outputs = self.bert_model(tokens_tensor, segments_tensors)
-                chunk_embeddings.append(outputs[0][0][0].numpy())
+            if bert_field_weight and not isQuery:
+                titleChunks = [doc["titletext"][i:i+max_seq_length] for i in range(0, len(doc["titletext"]), max_seq_length)]
+                bodyChunks = [doc["bodytext"][i:i+max_seq_length] for i in range(0, len(doc["bodytext"]), max_seq_length)]
+                chunk_embeddings = {}
+                chunk_embeddings["title"] = self.chunkEmbedding(titleChunks)
+                chunk_embeddings["body"] = self.chunkEmbedding(bodyChunks)
+                #chunk_embeddings = {"title": self.chunkEmbedding(titleChunks), "body": self.chunkEmbedding(bodyChunks)}
+                #logger.info("here")
+                #logger.info(chunk_embeddings)
+                #logger.info(input_doc["titletext"])
+            else:
+                chunks = [doc["text"][i:i+max_seq_length] for i in range(0, len(doc["text"]), max_seq_length)]
+                chunk_embeddings = self.chunkEmbedding(chunks)
+
+            
             # Aggregate embeddings for the entire document
             #logger.info("Adding embedding")
             if isQuery:
                 return np.mean(chunk_embeddings, axis=0)
             else:
-                doc["embedding"] = np.mean(chunk_embeddings, axis=0)
+                if bert_field_weight:
+                    doc["embedding"] = {
+                        "title": np.mean(chunk_embeddings["title"], axis=0),
+                        "body": np.mean(chunk_embeddings["body"], axis=0)
+                    }
+                    #logger.info(doc["embedding"])
+                else:
+                    doc["embedding"] = np.mean(chunk_embeddings, axis=0)
                 doc["text"] = ""
             #embeddings.append(np.mean(chunk_embeddings, axis=0))
         #return embeddings
-
+    def chunkEmbedding(self, chunks):
+        chunk_embeddings = []
+        for chunk in chunks:
+            #tokens = self.tokenizer.tokenize(self.tokenizer.decode(self.tokenizer.encode(chunk)))
+            tokens = self.tokenizer.tokenize(chunk)
+            #logger.info("tokens")
+            #logger.info(tokens)
+            #logger.info(bodyChunks)
+            indexed_tokens = self.tokenizer.convert_tokens_to_ids(tokens)
+            #logger.info("indexed_tokens")
+            #logger.info(indexed_tokens)
+            segments_ids = [1] * len(tokens)
+            #logger.info("segments_ids")
+            #logger.info(segments_ids)
+            tokens_tensor = torch.tensor([indexed_tokens])
+            #logger.info("tokens_tensor")
+            #logger.info(tokens_tensor)
+            segments_tensors = torch.tensor([segments_ids])
+            #logger.info("segments_tensors")
+            #logger.info(segments_tensors)
+            with torch.no_grad():
+                outputs = self.bert_model(tokens_tensor, segments_tensors)
+                #logger.info("outputs")
+                #logger.info(outputs[0][0][0].numpy())
+            chunk_embeddings.append(outputs[0][0][0].numpy())
+        #logger.info("outputs")
+        #logger.info(chunk_embeddings)
+        return chunk_embeddings
 
     #Function to calculate and return BERT score. 
     def calculate_bert_score(self, query):
@@ -164,7 +205,15 @@ class BM25F_and_BERT(BM25F):
             #logger.info("Embeddings")
             #logger.info(doc["embedding"][index])
             #logger.info(embeddings[index])
-            similarity = self.calculate_cosine_similarity(query_embedding, doc["embedding"])
+            if bert_field_weight:
+                #logger.info(str(doc["embedding"]["title"]))
+                similarity = {"title": self.calculate_cosine_similarity(query_embedding, doc["embedding"]["title"])
+                              ,"body": self.calculate_cosine_similarity(query_embedding, doc["embedding"]["body"])}
+                #logger.info("Cosine Sim")
+                #logger.info(doc["embedding"]["title"])
+                #logger.info(doc["embedding"]["body"])
+            else:
+                similarity = self.calculate_cosine_similarity(query_embedding, doc["embedding"])
 
             counter = 0
             document_length = 0
@@ -173,20 +222,35 @@ class BM25F_and_BERT(BM25F):
                 if counter > nr_of_fields:
                     break
                 document_length += len(doc[field][0])
-            logger.info(doc["title"][0])
-            #TODO Consider the right formula here
-            normalized_bert_score = similarity / ( document_length/(document_length*1.45+document_length**1.01))
-            logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
+            #logger.info(doc["title"][0])
 
-            counter = 0
-            for field in doc:
-                if counter > nr_of_fields:
-                    break
-                field_weight = self.field_weights.get(field, 1.0)
-                scores[index] += field_weight * normalized_bert_score
+            if bert_field_weight:
+                #logger.info("Weights")
+                #logger.info(self.field_weights)
+                normalized_bert_score = {
+                    "title": self.calculateNormalizredBert(similarity["title"], len(doc["title"][0]), self.field_weights["title"]),
+                    "body": self.calculateNormalizredBert(similarity["body"], len(doc["body"][0]), self.field_weights["body"])
+                }
+            else:
+                normalized_bert_score = self.calculateNormalizredBert(similarity, document_length)
+            #logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
+            #logger.info("document Length: " + str(document_length) + "   similarity: " + str(similarity) + "   Normalized Score: " + str(normalized_bert_score))
+            if bert_field_weight:
+                for i, field in enumerate(doc):
+                    if i >= nr_of_fields:
+                        break
+                    field_weight = self.field_weights[field]
+                    scores[index] += field_weight * normalized_bert_score[field]
+            else:
+                scores[index] = normalized_bert_score
         return scores
 
-
+    def calculateNormalizredBert(self, similarity, document_length, weight=1):
+        #TODO Consider what the right formula is here
+        weight = 1
+        return similarity / ( (document_length/(document_length*1.45+document_length**1.01)) * weight)
+    
+    
     #Function to calculate similairty between two non-empty vectors, which are the BERT embeddings of a query and document.
     def calculate_cosine_similarity(self, vector1, vector2):
         dot_product = sum(a * b for a, b in zip(vector1, vector2))
@@ -194,8 +258,8 @@ class BM25F_and_BERT(BM25F):
         magnitude2 = math.sqrt(sum(b**2 for b in vector2))
         if magnitude1 == 0 or magnitude2 == 0:
             return 0.0
-        logger.info("Similarity")
-        logger.info(dot_product / (magnitude1 * magnitude2))
+        #logger.info("Similarity")
+        #logger.info(dot_product / (magnitude1 * magnitude2))
         return dot_product / (magnitude1 * magnitude2)
 
     #Function which ranks docArray using both BM25F and BERT in a combined score, and appends it to each document.
@@ -206,11 +270,11 @@ class BM25F_and_BERT(BM25F):
             total_score_bm25f = 0.0
             
             # Calculate BM25F score for each word in the query
-            for word in query:
+            #for word in query['query'].split(" "):
                 #logger.info("Split")
                 #logger.info(split_documents)
-                score_bm25f = self.calculate_bm25f_score([word], split_documents[index])
-                total_score_bm25f += score_bm25f
+            score_bm25f = self.calculate_bm25f_score(query['query'], split_documents[index])
+            total_score_bm25f += score_bm25f
 
             # Calculate BERT score for the entire query
             
@@ -253,7 +317,7 @@ class Ranking:
         global is_model_ready
         global nr_of_fields
 
-        self.field_weights = {"title": 0.05, "body": 0.95}
+        self.field_weights = {"title": 0.5, "body": 0.5}
         nr_of_fields = len(self.field_weights)
         #Load search query from SPOIdentifier.py and splits into individual words
         #self.query = ["Who served as first lady of the United States in 2021?"]
@@ -313,10 +377,7 @@ class Ranking:
         return {"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score, "TimeStamp": doc.get("timeStamp")}
 
     def handle_request(self, query):
-        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray, self.split_documents)
-        #test_instance = TestBM25FBERT()
-
-        #test_instance.test_rank_documents_with_bert(result)   
+        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray, self.split_documents)  
         combined_json_top_10_results = map(self.Trim, result)
         return list(combined_json_top_10_results)
 
@@ -344,7 +405,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # Convert the result to JSON and send it
             response = json.dumps(result).encode('utf-8')
-            logger.info(response)
+            #logger.info(response)
             self.wfile.write(response)
         else:
             self.send_response(500)
