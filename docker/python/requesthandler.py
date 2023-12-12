@@ -3,45 +3,43 @@ import http.server
 import sys
 
 from ranking import Ranking
+import shared_utils
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        from main_ranking import handler
         print("Initializing RequestHandler", file=sys.stdout)
         # Call the __init__ method of the base class
         super().__init__(*args, **kwargs)
         # Create an instance of Ranking when the server starts
 
     def query(self, json_data):
-        from main_ranking import is_model_ready
-        from main_ranking import handler
-        from main_ranking import logger
 
         query = json_data["query"]
-        if is_model_ready: 
-            result = handler.handle_request(query)
+        shared_utils.logger.info("Response")
+        shared_utils.logger.info(shared_utils.is_model_ready)
+        if shared_utils.is_model_ready: 
+            result = shared_utils.handler.handle_request(query)
             # Send the response
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-
             # Convert the result to JSON and send it
             response = json.dumps(result).encode('utf-8')
-            logger.info(response)
+            shared_utils.logger.info("Response")
+            shared_utils.logger.info(response)
             self.wfile.write(response)
         else:
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
+            self.end_headers()
             response = json.dumps({"Err": "Processing docArray, please wait"}).encode('utf-8')
             self.wfile.write(response)
-            self.end_headers()
     
     def reset(self, json_data):
-        from main_ranking import handler
         self.send_response(200)
         self.end_headers()
-        handler = Ranking()
+        shared_utils.handler = Ranking()
         #self.send_header('Content-type', 'application/text')
         print("reset", file=sys.stdout)
     

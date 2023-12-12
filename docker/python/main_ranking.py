@@ -14,14 +14,16 @@ import time
 import logging
 from ranking import Ranking
 from requesthandler import RequestHandler
+import shared_utils
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
-bert_field_weight = True
-nr_of_fields = 2
-handler = None
-is_model_ready = False
+# logging.basicConfig(level=logging.INFO)
+# logger = logging.getLogger(__name__)
+
+# bert_field_weight = True
+# shared_utils.nr_of_fields = 2
+# handler = None
+# shared_utils.is_model_ready = False
 #File contains both the class BM25F and BM25FBERT. BM25FBERT is a subclass of BM25F, but it is possible to rewrite the class to not inherit from BM25F. However, BM25F is kept as a complete class incase future work needs it. Same goes for function to score docArray.
 
 
@@ -33,7 +35,7 @@ if __name__ == "__main__":
     port = 6969
     directory = '.'
     httpd = socketserver.TCPServer(("0.0.0.0", port), RequestHandler)
-    handler = Ranking()
+    shared_utils.handler = Ranking()
     print(f"Serving on port {port}", file=sys.stdout)
     try:
         httpd.serve_forever()

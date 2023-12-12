@@ -2,6 +2,8 @@ import math
 from collections import Counter
 import logging
 import math 
+import shared_utils
+
 
 class BM25F:
     #Initialize BM25F to be used for function calculate_bm25f_score in the class. Tweak k1 and b for better performing BM25F.
@@ -16,12 +18,11 @@ class BM25F:
 
     #Calculates avgerage field lengths, which is needed to calculate denominator used for score calculation
     def calculate_avg_field_lengths(self):
-        from main_ranking import nr_of_fields
         avg_field_lengths = {}
         counter = 0
         for field in self.docArray[0].keys():
             counter += 1
-            if counter > nr_of_fields:
+            if counter > shared_utils.nr_of_fields:
                 break
             total_length = sum(len(doc[field]) for doc in self.docArray)
             avg_field_lengths[field] = total_length / self.documents_count
@@ -29,13 +30,12 @@ class BM25F:
 
     #Calculates how many times the term appears in the document. Term count is needed to calculate inverted document frequency
     def calculate_term_counts(self):
-        from main_ranking import nr_of_fields
         term_counts_array = []
         for document in self.docArray:
             termCountsObject = {}
             for i, field in enumerate(document):
                 term_counts = Counter()
-                if i >= nr_of_fields:
+                if i >= shared_utils.nr_of_fields:
                     break
                 #for word in :
                 lowercase = document[field][0].lower()
@@ -67,7 +67,6 @@ class BM25F:
     
     #Function which calculates and returns BM25F score. 
     def calculate_bm25f_score(self, query, document):
-        from main_ranking import logger
         queryArray = self.query_splitter(query)
         score = 0.0
         document_lengths = {field: len(document[field]) for field in document}
@@ -75,17 +74,17 @@ class BM25F:
         for word in queryArray:
             for i, field in enumerate(document):
                 if word not in self.term_counts[i][field]:
-                    logger.info("Not in")
+                    shared_utils.logger.info("Not in")
                     continue
-                logger.info("in, idf:")
+                shared_utils.logger.info("in, idf:")
                 idf = self.calculate_idf(word, field, i)
-                logger.info(idf)
-                if i >= nr_of_fields:
+                shared_utils.logger.info(idf)
+                if i >= shared_utils.nr_of_fields:
                     break
                 term_frequency = document[field].count(word)
                 numerator = term_frequency * (self.k1 + 1)
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
                 score += self.field_weights[field] * idf * (numerator / denominator)
-                logger.info("BMF")
-                logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + str(denominator))
+                shared_utils.logger.info("BMF")
+                shared_utils.logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + str(denominator))
         return score
