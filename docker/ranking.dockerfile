@@ -5,6 +5,6 @@ RUN apt update && apt install inetutils-ping
 
 WORKDIR /app
 
-COPY "docker/python/BM25FBERT.py" /app/
+COPY "docker/python/*" /app/
 
-CMD ["python3" , "BM25FBERT.py"]
+CMD ["python3" , "main_ranking.py"]

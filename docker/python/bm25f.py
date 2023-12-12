@@ -16,7 +16,7 @@ class BM25F:
 
     #Calculates avgerage field lengths, which is needed to calculate denominator used for score calculation
     def calculate_avg_field_lengths(self):
-        global nr_of_fields
+        from main_ranking import nr_of_fields
         avg_field_lengths = {}
         counter = 0
         for field in self.docArray[0].keys():
@@ -29,7 +29,7 @@ class BM25F:
 
     #Calculates how many times the term appears in the document. Term count is needed to calculate inverted document frequency
     def calculate_term_counts(self):
-        global nr_of_fields
+        from main_ranking import nr_of_fields
         term_counts_array = []
         for document in self.docArray:
             termCountsObject = {}
@@ -67,6 +67,7 @@ class BM25F:
     
     #Function which calculates and returns BM25F score. 
     def calculate_bm25f_score(self, query, document):
+        from main_ranking import logger
         queryArray = self.query_splitter(query)
         score = 0.0
         document_lengths = {field: len(document[field]) for field in document}

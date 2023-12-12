@@ -1,11 +1,14 @@
-from bm25f_and_bert import BM25F_and_BERT    
+from bm25f_and_bert import BM25F_and_BERT   
+from bm25f import BM25F
 import psycopg2
 import logging
+import time
+
+
 
 class Ranking:
     def __init__(self):
-        global is_model_ready
-        global nr_of_fields
+        from main_ranking import logger
 
         self.field_weights = {"title": 0.5, "body": 0.5}
         nr_of_fields = len(self.field_weights)

@@ -6,18 +6,16 @@ from ranking import Ranking
 
 
 class RequestHandler(http.server.SimpleHTTPRequestHandler):
-    global is_model_ready
-    global handler
     def __init__(self, *args, **kwargs):
-        global handler
+        from main_ranking import handler
         print("Initializing RequestHandler", file=sys.stdout)
         # Call the __init__ method of the base class
         super().__init__(*args, **kwargs)
         # Create an instance of Ranking when the server starts
 
     def query(self, json_data):
-        global is_model_ready
-        global handler
+        from main_ranking import is_model_ready
+        from main_ranking import handler
 
         query = json_data["query"]
         if is_model_ready: 
@@ -39,7 +37,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
     
     def reset(self, json_data):
-        global handler
+        from main_ranking import handler
         self.send_response(200)
         self.end_headers()
         handler = Ranking()

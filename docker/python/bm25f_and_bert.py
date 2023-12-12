@@ -16,7 +16,7 @@ class BM25F_and_BERT(BM25F):
     
     #Function which generate BERT embedding of a text. Used to generate BERT embedding of query and document.
     def calculate_bert_embedding(self, docArray, isQuery = False):
-        global logger
+        from main_ranking import bert_field_weight
         # Combine title and body into a single string for each document        
         #document_texts = []#[" ".join(doc["title"] + doc["body"]) for doc in docArray]
         
@@ -96,8 +96,10 @@ class BM25F_and_BERT(BM25F):
 
     #Function to calculate and return BERT score. 
     def calculate_bert_score(self, query):
-        global logger
-        global nr_of_fields
+        from main_ranking import bert_field_weight
+        from main_ranking import nr_of_fields
+        from main_ranking import logger
+
         logger.info("Query")
         logger.info(query)
         query_embedding = self.calculate_bert_embedding([{"title": query, "body": ""}], True)
@@ -166,6 +168,7 @@ class BM25F_and_BERT(BM25F):
 
     #Function which ranks docArray using both BM25F and BERT in a combined score, and appends it to each document.
     def rank_documents_BM25AndBert(self, query, docArray, split_documents):
+        from main_ranking import logger
         document_scores = []
         scores_bert = self.calculate_bert_score(query)
         for index, document in enumerate(docArray):
