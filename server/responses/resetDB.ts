@@ -2,6 +2,7 @@ import { IncomingMessage as Request, ServerResponse as Response } from 'http';
 import { url } from './search';
 import { errorResponse } from '../responseHandlers';
 
+// res: response handles errors
 export function resetDB(req: Request, res: Response) {
     fetch(url + "reset", {
         method: "POST",

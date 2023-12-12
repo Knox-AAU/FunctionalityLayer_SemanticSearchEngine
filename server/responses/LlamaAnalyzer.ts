@@ -58,10 +58,9 @@ export function regexWordExtractor(sentence: string): string[] {
 
 // returns an array: [subject, object, predicate]
 export async function Llama_Analyze(
-	res: Response,
+	res: Response, // res: response handles errors
 	userQuery: string
 ): Promise<string[] | null> {
-	console.log('2.1, userquery is ' + userQuery);
 	const LlamaCommand = {
 		system_message: '',
 		user_message: `The sentence is "${userQuery}". List the subject, object and predicate in the sentence.\
@@ -70,9 +69,7 @@ export async function Llama_Analyze(
         subject: thesubject \n object: theobject \n predicate: thepredicate. if any of them don't exist in the query do like this: predicate: null`,
 		max_tokens: 100,
 	};
-	console.log('2.2');
 	JSON.stringify(LlamaCommand);
-	console.log('2.3');
 	// Step 3: Make a request to the Llama API to generate a response
 	return fetch(llamaUrl, {
 		method: 'POST',
@@ -84,7 +81,6 @@ export async function Llama_Analyze(
 		body: JSON.stringify(LlamaCommand),
 	})
 		.then((response) => {
-			console.log('2.4', response);
 			return response.json();
 		})
 		.then((data) => {
@@ -92,7 +88,6 @@ export async function Llama_Analyze(
 				errorResponse(res, 500, "Invalid response from Llama");
 				return null;
 			}
-			console.log('2.5');
 			const extractedInfo = regexWordExtractor(data.choices[0].text);
 			return extractedInfo;
 		})

@@ -13,7 +13,7 @@ const targetContainerHostname = 'ranking'; //  container name
 
 export const url = `http://${targetContainerHostname}:6969/`; //  portNumber and path
 
-export function KNOXSearch(req: Request, res: Response) {
+export function KNOXSearch(req: Request, res: Response) { //response of errors
 	// Extract data from the request body
 	getPostData(req) //Returns promise that retrieves post data in chunks
 		.then(async (data: any) => {
@@ -21,20 +21,17 @@ export function KNOXSearch(req: Request, res: Response) {
 
 			//Format the data as per the Llama API request structure
 			const formattedData = data as queryRequest;
-			console.log('2');
-			// Llama_Analyze returns an array:[subject, object, predicate]
+			// Llama_Analyze sends requests to the Llama API server. returns an array:[subject, object, predicate]
 			const llamaresult: string[] | null = await Llama_Analyze(
 				res,
 				formattedData.query
 			);
-			if (!llamaresult) return;
-			console.log('3');
+			if (!llamaresult) return;			
 			const subjectWord: string = llamaresult[0];
-			console.log('4');
 			const objectWord: string = llamaresult[1];
-			console.log('5');
 			const predicateWord: string = llamaresult[2];
-			console.log('6');
+
+			// Send request to KnowledgeGraph API
 			const nodeArray: string[] | null = await fetch_TripleFromGraph(
 				res,
 				subjectWord,
@@ -42,13 +39,13 @@ export function KNOXSearch(req: Request, res: Response) {
 				predicateWord
 			);
 			if (!nodeArray) return;
-			console.log('7');
 			//use nodeArray to get files from the Ranking module:
 			console.log('nodeArray' + nodeArray);
 			bertSearch(req, res, { query: nodeArray.join(' ') });
 		});
 }
 
+// res: response handles errors
 export function bertSearchDecorator(req: Request, res: Response) {
 	getPostData(req)
 		.then((data: any) => {
@@ -63,18 +60,23 @@ export function bertSearchDecorator(req: Request, res: Response) {
 		});
 }
 
+
+// res: response handles errors
+//  Handles BERT-based search by sending a POST request to a specified URL with query data.
 export function bertSearch(req: Request, res: Response, data: any) {
 	fetch(url + 'query', {
 		method: 'POST',
 		body: JSON.stringify(data),
 	})
-		.then(async (response) => {
+		.then(async (response) => { //
 			if (response.ok) {
 				response
 					.json()
 					.then((data: any) => {
 						res.statusCode = 200;
-						res.setHeader('Content-Type', determineMimeType('.json'));
+						// Set the Content-Type header based on the determined MIME type
+						res.setHeader('Content-Type', determineMimeType('.json')); // MIME -> Multipurpose Internet Mail Extensions
+						// Write the response data as a JSON string to the response
 						res.write(JSON.stringify(data));
 						res.end('\n');
 					})
@@ -95,6 +97,7 @@ export function bertSearch(req: Request, res: Response, data: any) {
 			}
 		})
 		.catch((err) => {
+			 // Handle the case where there is an error connecting to the Python container
 			errorResponse(
 				res,
 				500,

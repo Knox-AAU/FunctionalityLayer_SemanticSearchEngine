@@ -33,6 +33,7 @@ type dbEntry = {
   url: string
 }
 
+// res: response handles errors
 export const GrabButDataFirst = (req: Request, res: Response) => {
   return getPostData(req)
     .then((data) => {
@@ -43,6 +44,7 @@ export const GrabButDataFirst = (req: Request, res: Response) => {
     })
 }
 
+// res: response handles errors
 const insertIntoDB = async (entryPromise: Promise<dbEntry>, req: Request, res: Response) => {
   const entry = await entryPromise;
   await ensureConnected(client);

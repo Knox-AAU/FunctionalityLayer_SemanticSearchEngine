@@ -43,6 +43,7 @@ export function getArgs(argsRaw: String) {
 //Merges an object of timportObjectype JSON with a object on the disk of type JSON
 //Think of it like the Array.push() function but for objects on the
 //disk
+// res: response handles errors
 export function exportObjectPush(path: String, object: Object, res: Response) {
 	let arr: Object[] = [];
 	//We import the file first so we can add an object to it
@@ -65,6 +66,7 @@ export function exportObjectPush(path: String, object: Object, res: Response) {
 	return exportObject(path, arr, res);
 }
 
+// res: response handles errors
 //Exports an object to disk
 export function exportObject(path: String, object: Object, res: Response) {
 	try {
@@ -96,6 +98,7 @@ export function exportObject(path: String, object: Object, res: Response) {
 	}
 }
 
+// res: response handles errors
 //Reads an object from disk
 export function importObject(path: String, res: Response) {
 	//read a file synchronously, should probs be changed to read asynchronously
@@ -147,6 +150,7 @@ export function getLastSplit(input: String, splitChar: String) {
     return temp[temp.length - 1]
 }
 */
+// res: response handles errors
 export function validateUserExistence(res: Response, id: String) {
 	res;
 	let userPath = 'server/data/logins.json';
