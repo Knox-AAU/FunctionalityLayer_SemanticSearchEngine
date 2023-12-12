@@ -16,6 +16,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def query(self, json_data):
         from main_ranking import is_model_ready
         from main_ranking import handler
+        from main_ranking import logger
 
         query = json_data["query"]
         if is_model_ready: 
@@ -27,7 +28,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # Convert the result to JSON and send it
             response = json.dumps(result).encode('utf-8')
-            #logger.info(response)
+            logger.info(response)
             self.wfile.write(response)
         else:
             self.send_response(500)
