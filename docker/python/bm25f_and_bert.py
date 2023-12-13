@@ -179,7 +179,7 @@ class BM25F_and_BERT(BM25F):
             shared_utils.logger.info(total_score_bm25f)
             shared_utils.logger.info(scores_bert[index])
             # Combine BM25F and BERT scores
-            combined_score = scores_bert[index]#total_score_bm25f# + scores_bert[index]
+            combined_score = total_score_bm25f + scores_bert[index]
             document_scores.append((document, combined_score))
         # Sort docArray based on the combined score in descending order
         ranked_docArray = sorted(document_scores, key=lambda x: x[1], reverse=True)[:10]

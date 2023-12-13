@@ -1,13 +1,13 @@
 import React from 'react';
 // import { PdfObjectArray } from '../TypesAndLogic/Types';
-import { pdfObject } from  '../TypesAndLogic/Types';
+import { pdfObject } from '../TypesAndLogic/Types';
 
 const SearchResultComponent = ({ PdfObjects }: { PdfObjects: pdfObject[] }) => {
 
     return (
         <div className="search-results border-2 border-blue-900 rounded-lg overflow-y-auto h-1/3 p-4 w-4/5 ml-8 pl-3 bg-gray-300">
             {PdfObjects.map((PdfData) => (
-                <div key={PdfData.url} className="mb-4">
+                <div key={PdfData.url} className="mb-4" onClick={() => window.open(PdfData.url)}>
                     <p className="text-sm text-black">
                         Date: {PdfData.date} | Author: {PdfData.author}
                     </p>
