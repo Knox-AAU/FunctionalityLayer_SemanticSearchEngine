@@ -43,7 +43,7 @@ const Mainscreen = () => {
     author?: string;
     titleSearch?: boolean;
   }) => {
-    setLoading(true);
+    setLoading(true); //makes it so that the function can only run one at a time
     setError(null);
 
     const options = {

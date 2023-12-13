@@ -9,6 +9,7 @@ type spoQuery = {
   type: string
 }
 
+// res: response handles errors
 export function spoQuery(req: Request, res: Response) {
   getPostData(req).then(async (dataTemp) => {
     const data = dataTemp as spoQuery

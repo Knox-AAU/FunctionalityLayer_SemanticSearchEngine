@@ -12,7 +12,7 @@ import { resetDB } from './responses/resetDB'
 
 
 //Handles post requests
-export function postHandler(req: Request, res: Response) {
+export function postHandler(req: Request, res: Response) { //response of errors
     //const d = new Date()
     //const path = "Server/ServerData/CallerDB/callers" + "-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + ".json";
     console.log(req.url);
@@ -33,7 +33,7 @@ export function postHandler(req: Request, res: Response) {
 }
 
 
-
+// res: response handles errors
 //Handles http requests of method type GET
 export function getHandler(req: Request, res: Response) {
     //Split the url at "?" as first part is the path to the page and after is
@@ -56,6 +56,7 @@ export function getHandler(req: Request, res: Response) {
     responseCompiler(req, res);
 }
 
+// res: response handles errors
 //So far does nothing except continues, might do something later
 export function responseCompiler(req: Request, res: Response) {
     fileResponse(req.url!, res);
