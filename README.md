@@ -40,7 +40,7 @@ When the previous command has finished executing the node container starts compi
 ```bash
 $ docker-compose up node
 ```
-Note: If node finishes compiling the web app, nothing will be printed after "Attaching to semanticNode" if this is the case you can continue. If not the message: `Server running at http://0.0.0.0:80/` will eventually will eventually be printed. Now the app and server is ready, continue to next step.
+Note: If node finishes compiling the web app, nothing will be printed after "Attaching to semanticNode" if this is the case you can continue. If not the message: `Server running at http://0.0.0.0:80/` will eventually be printed. Now the app and server is ready, continue to next step.
 Note2: The terminal is now attached to the docker container and closing it or terminating the command will stop the container
 
 You can now navigate to localhost:8080 where the webapp should be running. 
