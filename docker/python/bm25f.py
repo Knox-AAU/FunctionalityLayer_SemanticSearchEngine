@@ -47,6 +47,12 @@ class BM25F:
     #Simple function that returns inverted document frequency
     def calculate_idf(self, term, field, index):
         document_with_term_count = self.term_counts[index][field][term]
+        print("term " + term)
+        print("term count object " + str(self.term_counts[1][field]))
+        print("Term Count object value " + str(self.term_counts[index][field][term]))
+
+
+        print("documents_count: " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
         return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0) + 1.0
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
