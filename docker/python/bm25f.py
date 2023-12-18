@@ -12,6 +12,7 @@ class BM25F:
         self.documents_count = len(docArray)
         self.avg_field_lengths = self.calculate_avg_field_lengths()
         self.term_counts = self.calculate_term_counts()
+        self.term_document_appearances = self.create_wordset_docArray()
         self.k1 = 2
         self.b = 100
         self.field_weights = field_weights
@@ -24,7 +25,7 @@ class BM25F:
             counter += 1
             if counter > shared_utils.nr_of_fields:
                 break
-            total_length = sum(len(doc[field]) for doc in self.docArray)
+            total_length = sum(len(doc[field][0]) for doc in self.docArray)
             avg_field_lengths[field] = total_length / self.documents_count
         return avg_field_lengths
 
@@ -37,22 +38,56 @@ class BM25F:
                 term_counts = Counter()
                 if i >= shared_utils.nr_of_fields:
                     break
-                #for word in :
                 lowercase = document[field][0].lower()
                 term_counts.update(lowercase.split())
                 termCountsObject[field] = term_counts
             term_counts_array.append(termCountsObject)
         return term_counts_array
-
+    
+    #Creates an object with all the words in all the documents as key
+    def create_wordset_docArray(self):
+        # create a wordset containing all words in the docarray
+        wordSet_DocArray = {}
+        for document in self.docArray:            
+            noRepeatWordDocSet = {}
+            docString = ""
+            # merges title and body into one string for convinience
+            for i, field in enumerate(document.keys()):
+                if(i >= shared_utils.nr_of_fields): break
+                docString += document[field][0].lower() + " "
+            words = docString.split()
+            # if the word doesnt exist in the string, add the word to the string
+            for word in words:
+                if word not in noRepeatWordDocSet:
+                    noRepeatWordDocSet[word] = True
+                    if word in wordSet_DocArray:
+                        wordSet_DocArray[word] += 1
+                    else:
+                        wordSet_DocArray[word] = 1
+        return wordSet_DocArray
+    
+    # # Counts how many documents contain term
+    # def count_documents_with_term2(self, term):
+    #     count=0
+    #     for document in self.docArray:
+    #         if (term in document["body"][0] or term in document["title"][0]):
+    #             count+=1
+    #     return count
+    
+    
+    def find(list, target):
+        for word in list:
+            if(word == target):
+                return True
+        return False
     #Simple function that returns inverted document frequency
     def calculate_idf(self, term, field, index):
-        document_with_term_count = self.term_counts[index][field][term]
+        document_with_term_count = self.term_document_appearances[term]
+        #document_with_term_count = self.term_counts[index][field][term]
         print("term " + term)
-        print("term count object " + str(self.term_counts[1][field]))
-        print("Term Count object value " + str(self.term_counts[index][field][term]))
 
 
-        print("documents_count: " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
+        print("documents_inTotal : " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
         return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0) + 1.0
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
@@ -61,8 +96,8 @@ class BM25F:
     
     #Function which splits the document so that BM25F can properly search the document for each keyword
     def bm25f_document_split(document):
-        split_title = document["title"][0].split()
-        split_body = document["body"][0].split()
+        split_title = document["title"][0].lower().split()
+        split_body = document["body"][0].lower().split()
         title_with_commas = ", ".join(split_title)
         body_with_commas = ", ".join(split_body)
         split_document = {
@@ -75,7 +110,10 @@ class BM25F:
     def calculate_bm25f_score(self, query, document):
         queryArray = self.query_splitter(query)
         score = 0.0
-        document_lengths = {field: len(document[field]) for field in document}
+        print("Document: " + str(document))
+        document_lengths = {field: len(document[field][0]) for field in document}
+        print("length of document: "+ str(document_lengths))
+        print("avg length of documents: "+ str(self.avg_field_lengths))
         #query_terms = Counter(queryArray)
         for word in queryArray:
             for i, field in enumerate(document):
@@ -84,6 +122,7 @@ class BM25F:
                     continue
                 shared_utils.logger.info("in, idf:")
                 idf = self.calculate_idf(word, field, i)
+                print("idf: "+str(idf))
                 shared_utils.logger.info(idf)
                 if i >= shared_utils.nr_of_fields:
                     break
