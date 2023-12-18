@@ -44,7 +44,7 @@ class Ranking:
         conn.close()
 
         # Initialize document array with PDF information
-        self.docArray = []  # could rename to pdfobjectarray as it is in front-end
+        self.docArray = []  
         shared_utils.logger.info("Documents: Starting...")
         for row in rows:
             with open(row[3], 'r') as file:
