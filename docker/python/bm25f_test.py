@@ -33,8 +33,10 @@ class unitTesterClass(unittest.TestCase):
         assert(self.BM25FInstance)
         assert(self.BM25FInstance.documents_count > 0)
     
-    # def testIdf(self):
-    #     assert(self.BM25FInstance.calculate_idf("michelle", "body", 0) == 0.4010299957)
+    def testIdf(self):
+        actualIdf = self.BM25FInstance.calculate_idf("michelle", "body", 0)
+        #print(actualIdf)
+        assert(actualIdf) == 0.9808292530117263
 
     def testCalculateBM25FScore(self):
         query = "is"
