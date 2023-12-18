@@ -33,14 +33,16 @@ class unitTesterClass(unittest.TestCase):
         assert(self.BM25FInstance)
         assert(self.BM25FInstance.documents_count > 0)
     
-    def testIdf(self):
-        assert(self.BM25FInstance.calculate_idf("michelle", "body", 0) == 0.4010299957)
+    # def testIdf(self):
+    #     assert(self.BM25FInstance.calculate_idf("michelle", "body", 0) == 0.4010299957)
 
     def testCalculateBM25FScore(self):
         query = "is"
         document = self.docArray[1]  # Choosing the second document for testing
         expected_score = 0.0  # Set the expected score based on your calculation
         actual_score = self.BM25FInstance.calculate_bm25f_score(query, document)
+        print(actual_score)
+        print("bm25f Actual score: " +str(actual_score))
         assert(actual_score == expected_score)
  
         

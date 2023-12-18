@@ -13,8 +13,8 @@ class BM25F:
         self.avg_field_lengths = self.calculate_avg_field_lengths()
         self.term_counts = self.calculate_term_counts()
         self.term_document_appearances = self.create_wordset_docArray()
-        self.k1 = 2
-        self.b = 100
+        self.k1 = 1.5
+        self.b = 0.5
         self.field_weights = field_weights
 
     #Calculates avgerage field lengths, which is needed to calculate denominator used for score calculation
@@ -83,12 +83,19 @@ class BM25F:
     #Simple function that returns inverted document frequency
     def calculate_idf(self, term, field, index):
         document_with_term_count = self.term_document_appearances[term]
+        print("documentswithterms: " + str(document_with_term_count ))
         #document_with_term_count = self.term_counts[index][field][term]
         print("term " + term)
 
 
         print("documents_inTotal : " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
-        return math.log((self.documents_count - document_with_term_count + 0.5) / (document_with_term_count + 0.5) + 1.0) + 1.0
+        idfNumerator = ((self.documents_count - document_with_term_count) + 0.5) 
+        idfDenominator =  (document_with_term_count + 0.5)
+        print("idfNumerator: " + str(idfNumerator))
+        print("idfDeno: " + str(idfDenominator))
+        idfInner = idfNumerator/idfDenominator + 1
+        print("idfinner: " + str(idfInner))
+        return math.log(idfInner) 
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
     def query_splitter(self, query):
@@ -126,7 +133,7 @@ class BM25F:
                 shared_utils.logger.info(idf)
                 if i >= shared_utils.nr_of_fields:
                     break
-                term_frequency = document[field].count(word)
+                term_frequency = document[field][0].count(word)
                 numerator = term_frequency * (self.k1 + 1)
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
                 score += self.field_weights[field] * idf * (numerator / denominator)
