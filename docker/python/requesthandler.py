@@ -16,18 +16,18 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     def query(self, json_data):
 
         query = json_data["query"]
-        shared_utils.logger.info("Response")
-        shared_utils.logger.info(shared_utils.is_model_ready)
+        shared_utils.bmBertOrBoth = json_data["bmBertOrBoth"]
         if shared_utils.is_model_ready: 
             result = shared_utils.handler.handle_request(query)
             # Send the response
+            shared_utils.logger.info("Result" + str(result))
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             # Convert the result to JSON and send it
             response = json.dumps(result).encode('utf-8')
-            shared_utils.logger.info("Response")
-            shared_utils.logger.info(response)
+            #shared_utils.logger.info("Response")
+            #shared_utils.logger.info(response)
             self.wfile.write(response)
         else:
             self.send_response(500)

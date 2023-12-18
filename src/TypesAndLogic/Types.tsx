@@ -4,5 +4,6 @@ export type pdfObject = {
   author: string;
   date: string;
   relevance: number;
+  PDFPath: string;
 };
 export type pdfObjectArray = pdfObject[];

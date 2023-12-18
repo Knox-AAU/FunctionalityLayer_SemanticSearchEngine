@@ -49,10 +49,12 @@ class Ranking:
         for row in rows:
             with open(row[3], 'r') as file:
                 self.docArray.append({
-                    "title": [row[0]],
-                    "body": [file.read()],
+                    "title": row[0].lower(),
+                    "body": file.read().lower(),
+                    "originalTitle": row[0],
                     "url": row[1],
                     "pdfPath": row[2],
+                    "author": row[4],
                     "timeStamp": row[5]
                 })
         
@@ -61,8 +63,8 @@ class Ranking:
         # Split documents into BM25F-compatible format
         shared_utils.logger.info("Documents: Splitting... ")
         self.split_documents = []
-        for doc in self.docArray:
-            self.split_documents.append(BM25F.bm25f_document_split(doc))
+        #for doc in self.docArray:
+        #    self.split_documents.append(BM25F.bm25f_document_split(doc))
         shared_utils.logger.info("Documents: Splitting done ")
 
         # Process documents with BM25F and BERT
@@ -82,17 +84,18 @@ class Ranking:
         return {
             "URL": doc.get("url"),
             "pdfPath": doc.get("pdfPath"),
-            "Title": doc.get("title"),
+            "Title": doc.get("originalTitle"),
             "Score": score,
-            "TimeStamp": doc.get("timeStamp")
+            "TimeStamp": doc.get("timeStamp"),
+            "Author": doc.get("author")
         }
 
     def handle_request(self, query):
         # Method to handle incoming requests and return ranked results
-        shared_utils.logger.info("Response")  
-        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray, self.split_documents)
-        shared_utils.logger.info("Response")  
-        shared_utils.logger.info(result)
+        #shared_utils.logger.info("Response")  
+        result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray)
+        #shared_utils.logger.info("Response")  
+        #shared_utils.logger.info(result)
         
         # Trim results and return as a list of dictionaries
         combined_json_top_10_results = map(self.Trim, result)
