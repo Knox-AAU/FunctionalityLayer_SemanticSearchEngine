@@ -28,3 +28,5 @@ yarn-error.log*
 
 *.pdf
 *.txt
+
+/docker/python/__pycache__
