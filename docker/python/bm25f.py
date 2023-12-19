@@ -45,6 +45,8 @@ class BM25F:
             term_counts_array.append(termCountsObject)
         return term_counts_array
     
+    
+    
     #Creates an object with all the words in all the documents as key
     def create_wordset_docArray(self):
         # create a wordset containing all words in the docarray
@@ -139,13 +141,14 @@ class BM25F:
                     continue
                 shared_utils.logger.info("in")
                 idf = self.calculate_idf(word, field, i)
+                print("idf is: " + str(idf))
                 term_frequency = document[field].count(word)
                 shared_utils.logger.info("document[" + field + "][0]: " + str(document[field]))
-                #hared_utils.logger.info("word: "+str(word))
-                #shared_utils.logger.info("term_frequency: "+str(term_frequency))
                 numerator = term_frequency * (self.k1 + 1)
+                print("bmf num is: " + str(numerator))
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
-                score += self.field_weights[field] * idf * (numerator / denominator)
-                #shared_utils.logger.info("BMF")
-                #shared_utils.logger.info("weight: " + str(self.field_weights[field]) + "   idf: " + str(idf) + "   numerator: " + str(numerator) + "   deno: " + str(denominator))
-        return score
+                print("bmf denom is: " + str(denominator))
+                partialscore = self.field_weights[field] * idf * (numerator / denominator)
+                print("partial score is: " + str(partialscore))
+                score += partialscore
+            return score

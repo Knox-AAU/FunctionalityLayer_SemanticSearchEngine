@@ -127,14 +127,10 @@ class BM25F_and_BERT(BM25F):
             score_bm25f = self.calculate_bm25f_score(query, docArray[index])
             total_score_bm25f += score_bm25f
 
-            # Calculate BERT score for the entire query
-            #shared_utils.logger.info("Scores")
-            #shared_utils.logger.info(total_score_bm25f)
-            #shared_utils.logger.info(scores_bert[index])
+
             # Combine BM25F and BERT scores
             combined_score = 0
-            bmBertOrBoth = int(shared_utils.bmBertOrBoth)
-            #shared_utils.logger.info("BmBertOrBoth: " + str(bmBertOrBoth) + " BMF: " + str(total_score_bm25f))
+            bmBertOrBoth = int(shared_utils.bmBertOrBoth)            
             if(bmBertOrBoth < 1 or bmBertOrBoth > 1):
                 combined_score += total_score_bm25f
             if(bmBertOrBoth > 0):
