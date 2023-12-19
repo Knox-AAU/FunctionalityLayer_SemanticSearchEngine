@@ -91,6 +91,7 @@ class Ranking:
         }
 
     def handle_request(self, query):
+        query = query.lower()
         # Method to handle incoming requests and return ranked results
         #shared_utils.logger.info("Response")  
         result = self.bm25f_bert_instance.rank_documents_BM25AndBert(query, self.docArray)

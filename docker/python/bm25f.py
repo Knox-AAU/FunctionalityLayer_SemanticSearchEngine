@@ -38,7 +38,7 @@ class BM25F:
                 term_counts = Counter()
                 if i >= shared_utils.nr_of_fields:
                     break
-                shared_utils.logger.info("document[field]: " + str(document[field]))
+                # shared_utils.logger.info("document[field]: " + str(document[field]))
                 lowercase = document[field].lower()
                 term_counts.update(lowercase.split())
                 termCountsObject[field] = term_counts
@@ -86,23 +86,23 @@ class BM25F:
     #Simple function that returns inverted document frequency
     def calculate_idf(self, term, field, index):
         document_with_term_count = self.term_document_appearances[term]
-        shared_utils.logger.info("documentswithterms: " + str(document_with_term_count ))
+        # shared_utils.logger.info("documentswithterms: " + str(document_with_term_count ))
         #document_with_term_count = self.term_counts[index][field][term]
-        shared_utils.logger.info("term " + term)
+        # shared_utils.logger.info("term " + term)
 
 
-        shared_utils.logger.info("documents_inTotal : " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
+        # shared_utils.logger.info("documents_inTotal : " + str(self.documents_count) + " document_with_term_count:" + str(document_with_term_count))
         idfNumerator = ((self.documents_count - document_with_term_count) + 0.5) 
         idfDenominator =  (document_with_term_count + 0.5)
-        shared_utils.logger.info("idfNumerator: " + str(idfNumerator))
-        shared_utils.logger.info("idfDeno: " + str(idfDenominator))
+        # shared_utils.logger.info("idfNumerator: " + str(idfNumerator))
+        # shared_utils.logger.info("idfDeno: " + str(idfDenominator))
         idfInner = idfNumerator/idfDenominator + 1
-        shared_utils.logger.info("idfinner: " + str(idfInner))
+        # shared_utils.logger.info("idfinner: " + str(idfInner))
         return math.log(idfInner) 
 
     #Function which splits a string so that BM25F can search the document for each keyword in query
     def query_splitter(self, query):
-        return query.lower().split()
+        return query.split()
     
     #Function which splits the document so that BM25F can properly search the document for each keyword
     def bm25f_document_split(document):
@@ -119,8 +119,9 @@ class BM25F:
     #Function which calculates and returns BM25F score. 
     def calculate_bm25f_score(self, query, document):
         queryArray = self.query_splitter(query)
+        # print("QuerryArray" + str(queryArray))
         score = 0.0
-        print("Document: " + str(document))
+        # print("Document: " + str(document))
         #document_lengths = {field: len(document[field][0]) for field in document}
         document_lengths = {}
         for i, field in enumerate(document.keys()):
@@ -133,17 +134,18 @@ class BM25F:
             for i, field in enumerate(document.keys()):
                 if i >= shared_utils.nr_of_fields:
                     break
-                shared_utils.logger.info("Word: " + word)
-                shared_utils.logger.info("Field: " + field)
-                shared_utils.logger.info("Count: " + str(document[field]))
+                # shared_utils.logger.info("Word: " + word)
+                # shared_utils.logger.info("Field: " + field)
+                # shared_utils.logger.info("Count: " + str(document[field]))
                 if word not in document[field].split():
-                    shared_utils.logger.info("Not in")
+                    # shared_utils.logger.info("Not in field: " + str(field) + "   word:" + str(word))
                     continue
-                shared_utils.logger.info("in")
+                # shared_utils.logger.info("in")
                 idf = self.calculate_idf(word, field, i)
                 print("idf is: " + str(idf))
                 term_frequency = document[field].count(word)
-                shared_utils.logger.info("document[" + field + "][0]: " + str(document[field]))
+                print("Term frequency: "+ str(term_frequency))
+                # shared_utils.logger.info("document[" + field + "][0]: " + str(document[field]))
                 numerator = term_frequency * (self.k1 + 1)
                 print("bmf num is: " + str(numerator))
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))
@@ -151,4 +153,4 @@ class BM25F:
                 partialscore = self.field_weights[field] * idf * (numerator / denominator)
                 print("partial score is: " + str(partialscore))
                 score += partialscore
-            return score
+        return score
