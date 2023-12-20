@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 // import { handleSortByDate, handleSortByRelevance } from '../Components/SortingLogic';
 
 type SearchBarComponentProps = {
-    onSearch: (searchParams: { query: string, publishedAfter: string, publishedBefore: string }) => void;
-    onBertSearch: (searchParams: { query: string, publishedAfter: string, publishedBefore: string }) => void;
+    onSearch: (searchParams: { query: string, publishedAfter: string, publishedBefore: string, bmBertOrBoth: string }) => void;
+    onBertSearch: (searchParams: { query: string, publishedAfter: string, publishedBefore: string, bmBertOrBoth: string }) => void;
     onSortByDate: () => void;
     onSortByRelevance: () => void;
     sortOrder: 'ascending' | 'descending';
@@ -35,17 +35,22 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onBer
     };
     const [publishedAfter, setPublishedAfter] = useState('');
     const [publishedBefore, setPublishedBefore] = useState('');
+    const [bmBertOrBoth, setbmBertOrBoth] = useState("1");
 
     const handleSearch = () => {
         if (query) {
-            onSearch({ query, publishedAfter, publishedBefore });
+            onSearch({ query, publishedAfter, publishedBefore, bmBertOrBoth });
         }
     };
     const handleBertSearch = () => {
         if (query) {
-            onBertSearch({ query, publishedAfter, publishedBefore });
+            onBertSearch({ query, publishedAfter, publishedBefore, bmBertOrBoth });
         }
     };
+    const handleRankingModeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log("TYPE" + event.target.value);
+        setbmBertOrBoth(event.target.value);
+    }
     return (
         <div className="search-bar ml-8 border-2 border-gray-900 rounded-lg mb-2 w-4/5 pl-6 py-2  bg-darkgrey">
             <input
@@ -131,7 +136,12 @@ const SearchBarComponent: React.FC<SearchBarComponentProps> = ({ onSearch, onBer
                         onChange={(e) => setPublishedBefore(e.target.value)}
                         className="border p-2 mr-2"
                     />
-
+                    <label>Ranking Mode:</label>
+                    <select value={bmBertOrBoth} onChange={handleRankingModeChange}>
+                        <option value={0}>BM25F</option>
+                        <option value={1}>Bert</option>
+                        <option value={2}>Both</option>
+                    </select>
                 </div>
             )}
         </div>

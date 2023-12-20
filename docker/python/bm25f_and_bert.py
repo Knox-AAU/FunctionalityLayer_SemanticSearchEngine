@@ -18,8 +18,8 @@ class BM25F_and_BERT(BM25F):
         # Combine title and body into a single string for each document        
         for input_doc in docArray:
             if shared_utils.bert_field_weight and not isQuery:
-                input_doc["bodytext"] = input_doc["body"][0]
-                input_doc["titletext"] = input_doc["title"][0]
+                input_doc["bodytext"] = input_doc["body"]
+                input_doc["titletext"] = input_doc["title"]
             else:
                 input_doc["text"] = "".join(input_doc["title"] + input_doc["body"])
 
@@ -66,8 +66,8 @@ class BM25F_and_BERT(BM25F):
 
     #Function to calculate and return BERT score. 
     def calculate_bert_score(self, query):
-        shared_utils.logger.info("Query")
-        shared_utils.logger.info(query)
+        #shared_utils.logger.info("Query")
+        #shared_utils.logger.info(query)
         query_embedding = self.calculate_bert_embedding([{"title": query, "body": ""}], True)
         scores = []
         for index, doc in enumerate(self.docArray):
@@ -84,11 +84,11 @@ class BM25F_and_BERT(BM25F):
                 counter += 1
                 if counter > shared_utils.nr_of_fields:
                     break
-                document_length += len(doc[field][0])
+                document_length += len(doc[field])
             if shared_utils.bert_field_weight:
                 normalized_bert_score = {
-                    "title": self.calculateNormalizredBert(similarity["title"], len(doc["title"][0]), self.field_weights["title"]),
-                    "body": self.calculateNormalizredBert(similarity["body"], len(doc["body"][0]), self.field_weights["body"])
+                    "title": self.calculateNormalizredBert(similarity["title"], len(doc["title"]), self.field_weights["title"]),
+                    "body": self.calculateNormalizredBert(similarity["body"], len(doc["body"]), self.field_weights["body"])
                 }
             else:
                 normalized_bert_score = self.calculateNormalizredBert(similarity, document_length)
@@ -119,20 +119,22 @@ class BM25F_and_BERT(BM25F):
         return dot_product / (magnitude1 * magnitude2)
 
     #Function which ranks docArray using both BM25F and BERT in a combined score, and appends it to each document.
-    def rank_documents_BM25AndBert(self, query, docArray, split_documents):
+    def rank_documents_BM25AndBert(self, query, docArray):
         document_scores = []
         scores_bert = self.calculate_bert_score(query)
         for index, document in enumerate(docArray):
             total_score_bm25f = 0.0
-            score_bm25f = self.calculate_bm25f_score(query, split_documents[index])
+            score_bm25f = self.calculate_bm25f_score(query, docArray[index])
             total_score_bm25f += score_bm25f
 
-            # Calculate BERT score for the entire query
-            shared_utils.logger.info("Scores")
-            shared_utils.logger.info(total_score_bm25f)
-            shared_utils.logger.info(scores_bert[index])
+
             # Combine BM25F and BERT scores
-            combined_score = scores_bert[index]#total_score_bm25f# + scores_bert[index]
+            combined_score = 0
+            bmBertOrBoth = int(shared_utils.bmBertOrBoth)            
+            if(bmBertOrBoth < 1 or bmBertOrBoth > 1):
+                combined_score += total_score_bm25f
+            if(bmBertOrBoth > 0):
+                combined_score += scores_bert[index]
             document_scores.append((document, combined_score))
         # Sort docArray based on the combined score in descending order
         ranked_docArray = sorted(document_scores, key=lambda x: x[1], reverse=True)[:10]

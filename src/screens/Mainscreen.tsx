@@ -42,6 +42,7 @@ const Mainscreen = () => {
     publishedBefore?: string;
     author?: string;
     titleSearch?: boolean;
+    bmBertOrBoth: string;
   }) => {
     setLoading(true); //makes it so that the function can only run one at a time
     setError(null);
@@ -64,17 +65,20 @@ const Mainscreen = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(JSON.stringify({ query: searchParams }));
-        console.log('Changing Data');
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify({ query: searchParams }));
+        //console.log('Changing Data');
+        //console.log(JSON.stringify(data));
         //"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score
         setPdfObjects(
           data.map((element: any) => {
+            //console.log("element" + JSON.stringify(element))
             return {
               url: element.URL,
               date: element.TimeStamp,
               relevance: element.Score,
               title: element.Title,
+              PDFPath: element.pdfPath,
+              author: element.Author
             };
           })
         );
@@ -91,6 +95,7 @@ const Mainscreen = () => {
     publishedBefore?: string;
     author?: string;
     titleSearch?: boolean;
+    bmBertOrBoth: string;
   }) => {
     setLoading(true);
     setError(null);
@@ -113,17 +118,20 @@ const Mainscreen = () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(JSON.stringify({ query: searchParams }));
-        console.log('Changing Data');
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify({ query: searchParams }));
+        //console.log('Changing Data');
+        //console.log(JSON.stringify(data));
         //"URL": doc.get("url"), "pdfPath": doc.get("pdfPath"), "Title": doc.get("title"), "Score": score
         setPdfObjects(
           data.map((element: any) => {
+            //console.log("element" + JSON.stringify(element))
             return {
               url: element.URL,
               date: element.TimeStamp,
               relevance: element.Score,
               title: element.Title,
+              PDFPath: element.pdfPath,
+              author: element.Author
             };
           })
         );
