@@ -72,7 +72,7 @@ class BM25F:
                 return True
         return False
     #Simple function that returns inverted document frequency
-    def calculate_idf(self, term, field, index):
+    def calculate_idf(self, term):
         document_with_term_count = self.term_document_appearances[term]
         idfNumerator = ((self.documents_count - document_with_term_count) + 0.5) 
         idfDenominator =  (document_with_term_count + 0.5)
