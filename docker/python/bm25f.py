@@ -38,7 +38,7 @@ class BM25F:
                 term_counts = Counter()
                 if i >= shared_utils.nr_of_fields:
                     break
-                shared_utils.logger.info("document[field]: " + str(document[field]))
+                #shared_utils.logger.info("document[field]: " + str(document[field]))
                 lowercase = document[field].lower()
                 term_counts.update(lowercase.split())
                 termCountsObject[field] = term_counts
@@ -135,7 +135,7 @@ class BM25F:
                     break
                 shared_utils.logger.info("Word: " + word)
                 shared_utils.logger.info("Field: " + field)
-                shared_utils.logger.info("Count: " + str(document[field]))
+                #shared_utils.logger.info("Count: " + str(document[field]))
                 if word not in document[field].split():
                     shared_utils.logger.info("Not in")
                     continue
@@ -143,7 +143,7 @@ class BM25F:
                 idf = self.calculate_idf(word, field, i)
                 print("idf is: " + str(idf))
                 term_frequency = document[field].count(word)
-                shared_utils.logger.info("document[" + field + "][0]: " + str(document[field]))
+                #shared_utils.logger.info("document[" + field + "][0]: " + str(document[field]))
                 numerator = term_frequency * (self.k1 + 1)
                 print("bmf num is: " + str(numerator))
                 denominator = term_frequency + self.k1 * (1 - self.b + self.b * (document_lengths[field] / self.avg_field_lengths[field]))

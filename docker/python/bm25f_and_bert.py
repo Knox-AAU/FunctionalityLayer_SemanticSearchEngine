@@ -98,7 +98,7 @@ class BM25F_and_BERT(BM25F):
                     if i >= shared_utils.nr_of_fields:
                         break
                     field_weight = self.field_weights[field]
-                    scores[index] += field_weight * normalized_bert_score[field]
+                    scores[index] += normalized_bert_score[field] # * field_weight Done in calculateNormalizredBert
             else:
                 scores[index] = normalized_bert_score
         return scores
@@ -106,7 +106,7 @@ class BM25F_and_BERT(BM25F):
     def calculateNormalizredBert(self, similarity, document_length, weight=1):
         #TODO Consider what the right formula is here
         # weight = 1
-        return similarity / ( (document_length/(document_length*1.45+document_length**1.01)) * weight)
+        return (similarity / (document_length/(document_length*1.45+document_length**1.01))) * weight
     
     
     #Function to calculate similairty between two non-empty vectors, which are the BERT embeddings of a query and document.
