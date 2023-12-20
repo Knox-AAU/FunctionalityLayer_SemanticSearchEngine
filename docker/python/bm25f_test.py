@@ -30,8 +30,7 @@ class unitTesterClass(unittest.TestCase):
         assert(self.BM25FInstance)
         assert(self.BM25FInstance.documents_count > 0)
     
-    #  def calculate_idf(self, term, field, index):
-    
+    #  def calculate_idf(self, term, field, index):    
     def testIdf(self):
         actualIdf = self.BM25FInstance.calculate_idf("michelle")
         #print(actualIdf)
