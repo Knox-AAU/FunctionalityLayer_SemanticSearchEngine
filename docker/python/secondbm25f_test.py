@@ -89,8 +89,7 @@ class unitTesterClass(unittest.TestCase):
         [ "velociraptor",      2,      seconddocArray,     2.1592,     0.0001,    BM25FInstance_database_2],
         [ "triceratops",      3,      seconddocArray,      2.1575,     0.0001,    BM25FInstance_database_2],
         [ "pterodactyle",      4,      seconddocArray,     1.0423,     0.0001,    BM25FInstance_database_2],
-        [ "tyranosaurus",      5,      seconddocArray,     1.0415,     0.0001,    BM25FInstance_database_2],
-        
+        [ "tyranosaurus",      5,      seconddocArray,     1.0415,     0.0001,    BM25FInstance_database_2],        
     ]
 
     def test(self):
@@ -105,13 +104,13 @@ def testCalculateBM25FScore(query, index, docArray, expected_score, tolerance, i
     document = docArray[index]
     document["title"] = docArray[index]["title"].lower()
     document["body"] = docArray[index]["body"].lower()
-    
+
     actual_score = instance.calculate_bm25f_score(query, document)
     print("the original query: " +str(query))
     print("bm25f Actual score: " +str(actual_score))
     assert(expected_score-tolerance < actual_score < expected_score+tolerance)
-        
-        
+    
+            
         
  
         

@@ -109,7 +109,7 @@ class BM25F:
                     break
                 if word not in document[field].split():
                     continue
-                idf = self.calculate_idf(word, field, i)
+                idf = self.calculate_idf(word)
                 print("idf is: " + str(idf))
                 term_frequency = document[field].count(word)
                 print("Term frequency: "+ str(term_frequency))
