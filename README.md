@@ -71,6 +71,11 @@ Have FUN
 ## Authors
 
 -  [Thomas Nykjær](https://github.com/ThomasNyk)
+-  [Marcus Lau](https://github.com/IronicJuice)
+-  [Tobias Berg](https://github.com/TobiasAAU)
+-  [Anders Nielsen](https://github.com/anderszeic)
+-  [Jacob Højris](https://github.com/nightvobs)
+-  [Mattias Pedersen](https://github.com/RealZul)
 
 ## Credits
 
